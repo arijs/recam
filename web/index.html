@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, user-scalable=no" />
+	<title>Registro de Campo</title>
+	<link rel="manifest" href="/manifest.json" />
+	<link rel="shortcut icon" type="image/png" href="/img/icon/384.png"/>
+	<style>
+		*, *::before, *::after {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+		html, body {
+			height: 100%;
+			font-size: 16px;
+			font-family: sans-serif;
+		}
+	</style>
+</head>
+<body>
+	<div id="rc-mount"></div>
+	<script>
+		var RC = RC || {};
+		RC.BaseUrl = '';
+	</script>
+	<script src="js/libs/localforage.js"></script>
+	<script src="js/libs/vue.js"></script>
+	<!--<script src="js/libs/vue-router.js"></script>-->
+	<script src="js/libs/vuex.js"></script>
+	<script src="js/libs/vue-text-mask.min.js"></script>
+	<script src="js/utils.js"></script>
+	<script src="js/env.js"></script>
+	<script src="js/services.js"></script>
+	<script src="js/store.js"></script>
+	<script src="js/index.js"></script>
+</body>
+</html>
