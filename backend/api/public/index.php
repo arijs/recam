@@ -2,8 +2,13 @@
 
 declare(strict_types=1);
 
+$allowed = [];
+$allowed[__FILE__] = true;
+$allowed[realpath(__DIR__.'/../../../web/api/index.php')] = true;
+$allowed = $allowed[$_SERVER['SCRIPT_FILENAME']];
+
 // Delegate static file requests back to the PHP built-in webserver
-if (PHP_SAPI === 'cli-server' && $_SERVER['SCRIPT_FILENAME'] !== __FILE__) {
+if (PHP_SAPI === 'cli-server' && !$allowed) {
     return false;
 }
 

@@ -39,6 +39,7 @@
     },
     "require": {
         "php": "^7.1",
+        "los/basepath": "^2.0",
         "roave/security-advisories": "dev-master",
         "zendframework/zend-component-installer": "^2.1.1",
         "zendframework/zend-config-aggregator": "^1.0",

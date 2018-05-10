@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "581074621e7fda0e133b8572657ca7b7",
+    "content-hash": "e82aa9b202b1fe0bb7b39d0b93ab46a9",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -141,6 +141,54 @@
                 "views"
             ],
             "time": "2016-12-28T00:14:17+00:00"
+        },
+        {
+            "name": "los/basepath",
+            "version": "2.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Lansoweb/basepath.git",
+                "reference": "49971e9c7c5867bf4ac4dcb217fd73a527a38ca4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Lansoweb/basepath/zipball/49971e9c7c5867bf4ac4dcb217fd73a527a38ca4",
+                "reference": "49971e9c7c5867bf4ac4dcb217fd73a527a38ca4",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1",
+                "psr/container": "^1.0",
+                "psr/http-message": "~1.0",
+                "psr/http-server-middleware": "^1.0"
+            },
+            "require-dev": {
+                "phpstan/phpstan": "^0.9.2",
+                "phpunit/phpunit": "^7.0",
+                "squizlabs/php_codesniffer": "^2.7",
+                "zendframework/zend-coding-standard": "^1.0",
+                "zendframework/zend-diactoros": "^1.0",
+                "zendframework/zend-expressive-helpers": "^5.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "LosMiddleware\\BasePath\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Leandro Silva",
+                    "homepage": "http://leandrosilva.info/"
+                }
+            ],
+            "description": "PHP middleware to remove a path prefix from request uri",
+            "homepage": "https://github.com/lansoweb/basepath",
+            "time": "2018-04-23T10:48:42+00:00"
         },
         {
             "name": "nikic/fast-route",
