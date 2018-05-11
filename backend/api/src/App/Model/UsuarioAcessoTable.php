@@ -10,6 +10,13 @@ class UsuarioAcessoTable
 {
     private $tableGateway;
 
+    public static $model = UsuarioAcesso::class;
+    public static $tableName = 'usuarios_acessos';
+
+    public static function create() {
+        return new self::$model();
+    }
+
     public function __construct(TableGatewayInterface $tableGateway)
     {
         $this->tableGateway = $tableGateway;

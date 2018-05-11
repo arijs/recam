@@ -37,9 +37,7 @@ class ConfigProvider
             ],
             'factories'  => [
                 Handler\HomePageHandler::class => Handler\HomePageHandlerFactory::class,
-                Model\Usuario::class => Model\ModelFactory::class,
                 Model\UsuarioTable::class => Model\ModelTableFactory::class,
-                Model\UsuarioAcesso::class => Model\ModelFactory::class,
                 Model\UsuarioAcessoTable::class => Model\ModelTableFactory::class,
             ],
         ];

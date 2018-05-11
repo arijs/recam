@@ -12,14 +12,12 @@ class ModelTableFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $container, $tableClass, array $options = null)
     {
-        $config = $container->get('config');
-        $modelConfig = $config['models']['mapTable'][$tableClass];
-        $modelClass = $modelConfig['modelClass'];
-        $tableName = $modelConfig['tableName'];
+        // $modelClass = $tableClass::$model;
+        // $tableName = $tableClass::$tableName;
         $dbAdapter = $container->get(AdapterInterface::class);
         $resultSetPrototype = new ResultSet();
-        $resultSetPrototype->setArrayObjectPrototype(new $modelClass());
-        $tableGateway = new TableGateway($tableName, $dbAdapter, null, $resultSetPrototype);
+        $resultSetPrototype->setArrayObjectPrototype(new $tableClass::$model());
+        $tableGateway = new TableGateway($tableClass::$tableName, $dbAdapter, null, $resultSetPrototype);
         return new $tableClass($tableGateway);
     }
 }
