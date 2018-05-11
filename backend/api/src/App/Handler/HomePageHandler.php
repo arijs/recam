@@ -14,35 +14,41 @@ use Zend\Expressive\Router;
 use Zend\Expressive\Template;
 use Zend\Expressive\Twig\TwigRenderer;
 use Zend\Expressive\ZendView\ZendViewRenderer;
+use App\Model\UsuarioTable;
 
 class HomePageHandler implements RequestHandlerInterface
 {
     private $containerName;
-
     private $router;
-
     private $template;
+    private $usuarioTable;
 
     public function __construct(
         Router\RouterInterface $router,
         Template\TemplateRendererInterface $template = null,
-        string $containerName
+        string $containerName,
+        UsuarioTable $usuarioTable
     ) {
         $this->router        = $router;
         $this->template      = $template;
         $this->containerName = $containerName;
+        $this->usuarioTable  = $usuarioTable;
     }
 
     public function handle(ServerRequestInterface $request) : ResponseInterface
     {
+        $usuarios = $this->usuarioTable->fetchOffsetLimit(0, 20);
+
         if (! $this->template) {
             return new JsonResponse([
                 'welcome' => 'Congratulations! You have installed the zend-expressive skeleton application.',
                 'docsUrl' => 'https://docs.zendframework.com/zend-expressive/',
+                'usuarios' => $usuarios,
             ]);
         }
 
         $data = [];
+        $data['usuarios'] = $usuarios;
 
         switch ($this->containerName) {
             case 'Aura\Di\Container':

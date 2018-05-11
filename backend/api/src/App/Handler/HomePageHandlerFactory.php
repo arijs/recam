@@ -8,6 +8,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Zend\Expressive\Router\RouterInterface;
 use Zend\Expressive\Template\TemplateRendererInterface;
+use App\Model\UsuarioTable;
 
 class HomePageHandlerFactory
 {
@@ -17,7 +18,8 @@ class HomePageHandlerFactory
         $template = $container->has(TemplateRendererInterface::class)
             ? $container->get(TemplateRendererInterface::class)
             : null;
+        $usuarioTable = $container->get(UsuarioTable::class);
 
-        return new HomePageHandler($router, $template, get_class($container));
+        return new HomePageHandler($router, $template, get_class($container), $usuarioTable);
     }
 }

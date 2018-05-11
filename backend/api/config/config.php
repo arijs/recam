@@ -37,6 +37,8 @@ $aggregator = new ConfigAggregator([
 
     // Load development config if it exists
     new PhpFileProvider(realpath(__DIR__) . '/development.config.php'),
+
+    new ArrayProvider($bootConfig),
 ], $cacheConfig['config_cache_path']);
 
 return $aggregator->getMergedConfig();

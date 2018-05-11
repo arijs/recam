@@ -3,12 +3,12 @@
 declare(strict_types=1);
 
 $allowed = [];
-$allowed[__FILE__] = true;
-$allowed[realpath(__DIR__.'/../../../web/api/index.php')] = true;
-$allowed = $allowed[$_SERVER['SCRIPT_FILENAME']];
+$allowed[__FILE__] = ['los_basepath' => ''];
+$allowed[realpath(__DIR__.'/../../../web/api/index.php')] = ['los_basepath' => '/api'];
+$bootConfig = $allowed[$_SERVER['SCRIPT_FILENAME']];
 
 // Delegate static file requests back to the PHP built-in webserver
-if (PHP_SAPI === 'cli-server' && !$allowed) {
+if (PHP_SAPI === 'cli-server' && !$bootConfig) {
     return false;
 }
 
@@ -18,7 +18,7 @@ require 'vendor/autoload.php';
 /**
  * Self-called anonymous function that creates its own scope and keep the global namespace clean.
  */
-(function () {
+(function () use ($bootConfig) {
     /** @var \Psr\Container\ContainerInterface $container */
     $container = require 'config/container.php';
 
