@@ -2,9 +2,13 @@
 
 declare(strict_types=1);
 
+$apiServer = realpath(__DIR__.'/../../../public_html/api/index.php');
+$apiLocal = realpath(__DIR__.'/../../../web/api/index.php');
+
 $allowed = [];
 $allowed[__FILE__] = ['los_basepath' => ''];
-$allowed[realpath(__DIR__.'/../../../web/api/index.php')] = ['los_basepath' => '/api'];
+if ($apiServer) $allowed[$apiServer] = ['los_basepath' => '/api'];
+if ($apiLocal) $allowed[$apiLocal] = ['los_basepath' => '/api'];
 $bootConfig = $allowed[$_SERVER['SCRIPT_FILENAME']];
 
 // Delegate static file requests back to the PHP built-in webserver
