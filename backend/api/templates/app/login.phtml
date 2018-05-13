@@ -1,9 +1,9 @@
-<?php $this->layout('layout::default', ['title' => 'Home']) ?>
+<?php $this->layout('layout::default', ['title' => 'Home', 'usuario' => null, 'baseUrl' => $baseUrl]) ?>
 
 <div class="row justify-content-center">
 	<div class="col-md-6">
 <?php if (isset($error)): ?>
-		<div class="card card-danger">
+		<div class="card text-white bg-danger mb-3">
 			<div class="card-header">Erro</div>
 			<div class="card-body">
 				<?= $this->e($error) ?>

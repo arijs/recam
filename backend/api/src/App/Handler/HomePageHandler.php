@@ -15,6 +15,8 @@ use Zend\Expressive\Template;
 use Zend\Expressive\Twig\TwigRenderer;
 use Zend\Expressive\ZendView\ZendViewRenderer;
 use App\Model\UsuarioTable;
+use App\Middleware\InjectAuthMiddleware;
+use App\Middleware\InjectBaseUrlMiddleware;
 
 class HomePageHandler implements RequestHandlerInterface
 {
@@ -37,10 +39,14 @@ class HomePageHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request) : ResponseInterface
     {
+        $session = $request->getAttribute(InjectAuthMiddleware::class);
+        $baseUrl = $request->getAttribute(InjectBaseUrlMiddleware::class);
         $usuarios = $this->usuarioTable->fetchOffsetLimit(0, 20);
 
         if (! $this->template) {
             return new JsonResponse([
+                'baseUrl' => $baseUrl,
+                'usuario' => $session['usuario'],
                 'welcome' => 'Congratulations! You have installed the zend-expressive skeleton application.',
                 'docsUrl' => 'https://docs.zendframework.com/zend-expressive/',
                 'usuarios' => $usuarios,
@@ -48,6 +54,8 @@ class HomePageHandler implements RequestHandlerInterface
         }
 
         $data = [];
+        $data['baseUrl'] = $baseUrl;
+        $data['usuario'] = $session['usuario'];
         $data['usuarios'] = $usuarios;
 
         switch ($this->containerName) {

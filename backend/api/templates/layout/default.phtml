@@ -64,6 +64,22 @@
 
     <div class="app-content">
         <main class="container">
+
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="list-group">
+                        <a class="list-group-item" href="<?= $baseUrl ?>/">Home</a>
+<?php if (empty($usuario)): ?>
+                        <a class="list-group-item" href="<?= $baseUrl ?>/login">Login</a>
+                        <a class="list-group-item" href="<?= $baseUrl ?>/usuario/cadastrar">Cadastrar usuário</a>
+<?php else: ?>
+                        <span class="list-group-item"><?= $this->e($usuario->usuario_nome) ?></span>
+                        <a class="list-group-item" href="<?= $baseUrl ?>/logout">Logout</a>
+<?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
             <?=$this->section('content')?>
         </main>
     </div>
