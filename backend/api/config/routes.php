@@ -33,6 +33,9 @@ use Zend\Expressive\MiddlewareFactory;
  * );
  */
 return function (Application $app, MiddlewareFactory $factory, ContainerInterface $container) : void {
+    $app->route('/login', App\Handler\LoginHandler::class, ['GET', 'POST'], 'login');
+    $app->get('/logout', App\Handler\LogoutHandler::class, 'logout');
+    $app->route('/usuario/cadastrar', App\Handler\UsuarioCadastrarHandler::class, ['GET', 'POST'], 'usuario.cadastrar');
     $app->get('/', App\Handler\HomePageHandler::class, 'home');
     $app->get('/api/ping', App\Handler\PingHandler::class, 'api.ping');
 };

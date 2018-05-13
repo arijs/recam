@@ -23,7 +23,7 @@
 			</div>
 			<div class="panel-body tab-content">
 				<div class="tab-pane<?= empty($tabRegister) ? ' active' : '' ?>" role="tabpanel" id="form-login">
-					<form class="form-horizontal" action="/login" method="post">
+					<form class="form-horizontal" action="<?= $baseUrl ?>/login" method="post">
 						<div class="form-group">
 							<label class="col-md-2 control-label">E-mail</label>
 							<div class="col-md-10">
@@ -51,7 +51,7 @@
 					<p>O administrador irá verificar seus dados e realizar a liberação de acesso.</p>
 					<p>Você receberá um aviso por e-mail quando isso acontecer.</p>
 <?php else: ?>
-					<form class="form-horizontal" action="/usuario/cadastrar" method="post">
+					<form class="form-horizontal" action="<?= $baseUrl ?>/usuario/cadastrar" method="post">
 						<div class="form-group">
 							<label class="col-md-4 control-label">Nome</label>
 							<div class="col-md-8">

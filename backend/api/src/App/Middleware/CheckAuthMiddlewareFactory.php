@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace App\Middleware;
 
 use Psr\Container\ContainerInterface;
+use Zend\Authentication\AuthenticationService;
 
-class AuthMiddlewareFactory
+class CheckAuthMiddlewareFactory
 {
     public function __invoke(ContainerInterface $container) : AuthMiddleware
     {
-        return new AuthMiddleware();
+        return new CheckAuthMiddleware($container->get(AuthenticationService::class));
     }
 }

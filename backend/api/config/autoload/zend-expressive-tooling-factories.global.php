@@ -12,7 +12,7 @@ declare(strict_types=1);
 return [
     'dependencies' => [
         'factories' => [
-            App\Middleware\AuthMiddleware::class => App\Middleware\AuthMiddlewareFactory::class,
+            App\Middleware\InjectBaseUrlMiddleware::class => App\Middleware\InjectBaseUrlMiddlewareFactory::class,
         ],
     ],
 ];

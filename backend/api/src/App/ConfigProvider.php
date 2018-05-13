@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App;
 
+use Zend\Authentication\AuthenticationService;
+
 /**
  * The configuration provider for the App module
  *
@@ -36,7 +38,14 @@ class ConfigProvider
                 Handler\PingHandler::class => Handler\PingHandler::class,
             ],
             'factories'  => [
+                AuthenticationService::class => AuthenticationServiceFactory::class,
+                MyAuthAdapter::class => MyAuthAdapterFactory::class,
+                Middleware\InjectAuthMiddleware::class => Middleware\InjectAuthMiddlewareFactory::class,
+                Middleware\CheckAuthMiddleware::class => Middleware\CheckAuthMiddlewareFactory::class,
                 Handler\HomePageHandler::class => Handler\HomePageHandlerFactory::class,
+                Handler\LoginHandler::class => Handler\LoginHandlerFactory::class,
+                Handler\LogoutHandler::class => Handler\LogoutHandlerFactory::class,
+                Handler\UsuarioCadastrarHandler::class => Handler\UsuarioCadastrarHandlerFactory::class,
                 Model\UsuarioTable::class => Model\ModelTableFactory::class,
                 Model\UsuarioAcessoTable::class => Model\ModelTableFactory::class,
             ],
