@@ -1,16 +1,16 @@
-var RC = RC || {};
+var RECAM = RECAM || {};
 
 (function() {
 
-var Utils = RC.Utils;
+var Utils = RECAM.Utils;
 var mask = Utils.mask;
 var valida = Utils.valida;
-var services = RC.Services;
+var services = RECAM.Services;
 var hasOwnProperty = Object.prototype.hasOwnProperty;
 var query = Utils.parseQuery(location.search);
 
 var state = {
-	baseUrl: (RC.BaseUrl || ''),
+	baseUrl: (RECAM.BaseUrl || ''),
 	query: query,
 	pageScroll: [0, 0],
 	screen: null
@@ -50,6 +50,6 @@ var store = new Vuex.Store({
 	mutations: mutations
 });
 
-RC.store = store;
+RECAM.store = store;
 
 })();

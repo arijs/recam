@@ -1,0 +1,35 @@
+<div class="oimpsac--form-campo--select oimpsac--form-campo--base"
+	v-bind:class="cssClass"
+>
+	<div class="campo-border">
+		<a href="javascript:;"
+			class="campo-anchor"
+			role="combobox"
+			v-bind:aria-label="campo.ariaLabelSelect || 'Selecione'"
+			v-bind:aria-expanded="opened ? 'true' : void 0"
+			aria-haspopup="listbox"
+			v-on:focus="emitFocus"
+			v-on:blur="emitBlur"
+			v-on:keydown.space="pressSpaceCampo"
+			v-on:click="campoClick"
+			ref="select">
+			<!--<div class="campo-label" v-text="campo.rotulo"></div>-->
+			<div class="campo-label">
+				<span class="campo-name" v-text="campo.rotulo"></span>
+				<span class="campo-detail" v-text="campo.detalhe"></span>
+			</div>
+			<div class="campo-value">
+				<div class="pseudo-input" v-text="selecionadoTexto"></div>
+			</div>
+			<div class="campo-validation" v-text="campo.erro"></div>
+			<div class="campo-arrow">
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="10" viewBox="0 0 16 10">
+					<path fill="none" fill-rule="evenodd" stroke="#000" d="M16 1.09L8.046 9 0 1"/>
+				</svg>
+			</div>
+		</a>
+		<div class="campo-lista" role="listbox" ref="lista" v-show="opened">
+			<a v-for="opcao in campo.opcoes" v-bind:aria-label="campo.ariaLabelOption || 'opção'" role="option" href="javascript:;" v-text="opcao.texto" v-bind:title="opcao.title || opcao.texto" v-on:focus="emitFocus" v-on:keydown.space="pressSpaceOpcao(opcao, $event)" v-on:click="opcaoClick(opcao)"></a>
+		</div>
+	</div>
+</div>

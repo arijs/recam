@@ -1,7 +1,7 @@
 (function() {
 
-var Utils = RC.Utils;
+var Utils = RECAM.Utils;
 
-RC.comp['root'] = {};
+RECAM.comp['root'] = {};
 
 })();

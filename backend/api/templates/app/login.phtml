@@ -2,14 +2,6 @@
 
 <div class="row justify-content-center">
 	<div class="col-md-6">
-<?php if (isset($error)): ?>
-		<div class="card text-white bg-danger mb-3">
-			<div class="card-header">Erro</div>
-			<div class="card-body">
-				<?= $this->e($error) ?>
-			</div>
-		</div>
-<?php endif; ?>
 		<div class="card card-default">
 			<div class="card-header card-header-tabs">
 				<ul class="nav nav-tabs" role="tablist">
@@ -36,6 +28,11 @@
 								<input type="password" class="form-control" name="password"/>
 							</div>
 						</div>
+<?php if (isset($error)): ?>
+						<div class="alert alert-danger" role="alert">
+							<p class="mb-0"><?= $this->e($error) ?></p>
+						</div>
+<?php endif; ?>
 						<div class="form-group row mb-0">
 							<label class="col-md-2 col-form-label"></label>
 							<div class="col-md-10">
@@ -77,12 +74,12 @@
 								<input type="password" class="form-control" name="password_confirm"/>
 							</div>
 						</div>
-						<div class="form-group row mb-0">
 <?php if (isset($register_error)): ?>
-							<div class="alert alert-danger" role="alert">
-								<p><?= $this->e($register_error) ?></p>
-							</div>
+						<div class="alert alert-danger" role="alert">
+							<p class="mb-0"><?= $this->e($register_error) ?></p>
+						</div>
 <?php endif; ?>
+						<div class="form-group row mb-0">
 							<label class="col-md-4 col-form-label"></label>
 							<div class="col-md-8">
 								<button type="submit" class="btn btn-primary">Enviar</button>

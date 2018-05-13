@@ -1,13 +1,13 @@
-var RC = RC || {};
+var RECAM = RECAM || {};
 
 (function() {
 
-	var Utils = RC.Utils;
-	var Env = RC.Env;
+	var Utils = RECAM.Utils;
+	var Env = RECAM.Env;
 
 	var services = {
 	};
 
-	RC.Services = services;
+	RECAM.Services = services;
 
 })();

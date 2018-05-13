@@ -1,10 +1,10 @@
 
-var RC = RC || {};
+var RECAM = RECAM || {};
 
 (function (){
 
 var Utils = {};
-RC.Utils = Utils;
+RECAM.Utils = Utils;
 
 function AjaxError(message, xhr, error) {
 	this.name = 'AjaxError';
@@ -50,8 +50,8 @@ Utils.forEach = function forEach(list, cb, result) {
 		result = result[1];
 	}
 	var ctx = {
-		_break,
-		_remove,
+		_break: _break,
+		_remove: _remove,
 		result: result,
 		count: list.length,
 		i: 0

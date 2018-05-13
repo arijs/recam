@@ -1,10 +1,10 @@
 
-var RC = RC || {};
+var RECAM = RECAM || {};
 
 (function() {
 
-var Utils = RC.Utils;
-RC.comp = {};
+var Utils = RECAM.Utils;
+RECAM.comp = {};
 
 var compFactory = {};
 
@@ -15,14 +15,14 @@ Vue.mixin({
 		if (factory) {
 			return factory;
 		}
-		var prefix = 'rc--';
+		var prefix = 'recam--';
 		var plen = prefix.length;
 		if (id.substr(0, plen).toLowerCase() === prefix) {
 			var name = id.substr(plen).replace(/--/g,'/');
 			var last = name.lastIndexOf('/');
 			last = name.substr(last+1);
-			var href = (RC.BaseUrl || '') + '/comp/'+name+'/'+last;
-			factory = Utils.componentDynamic(name, href, RC.comp);
+			var href = (RECAM.BaseUrl || '') + '/comp/'+name+'/'+last;
+			factory = Utils.componentDynamic(name, href, RECAM.comp);
 			compFactory[id] = factory;
 			return factory;
 		}
@@ -31,24 +31,24 @@ Vue.mixin({
 
 Vue.component('masked-input', vueTextMask.default);
 
-Vue.options.componentDynamic('rc--root')(
+Vue.options.componentDynamic('recam--root')(
 	function(compRoot) {
-		compRoot.store = RC.store;
-		var CompRoot = Vue.component('rc--root', compRoot);
+		compRoot.store = RECAM.store;
+		var CompRoot = Vue.component('recam--root', compRoot);
 		var root = new CompRoot();
-		root.$mount('#rc-mount');
-		RC.$root = root;
+		root.$mount('#recam-mount');
+		RECAM.$root = root;
 	},
 	function(err) {
 		new Vue({
-			el: '#rc-mount',
-			template: '<div class="rc--component-error">'
+			el: '#recam-mount',
+			template: '<div class="recam--component-error">'
 				+ Utils.htmlEntitiesEncode(String(err))
 				+ '</div>'
 		});
 	}
 );
 
-RC.store.commit('setScreen', 1);
+RECAM.store.commit('setScreen', 1);
 
 })();
