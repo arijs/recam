@@ -1,49 +1,50 @@
 <?php $this->layout('layout::default', ['title' => 'Home']) ?>
 
-<div class="row">
-	<div class="col-md-offset-3 col-md-6">
+<div class="row justify-content-center">
+	<div class="col-md-6">
 <?php if (isset($error)): ?>
-		<div class="panel panel-danger">
-			<div class="panel-heading">Erro</div>
-			<div class="panel-body">
+		<div class="card card-danger">
+			<div class="card-header">Erro</div>
+			<div class="card-body">
 				<?= $this->e($error) ?>
 			</div>
 		</div>
 <?php endif; ?>
-		<div class="panel panel-default">
-			<div class="panel-heading panel-heading-tabs">
+		<div class="card card-default">
+			<div class="card-header card-header-tabs">
 				<ul class="nav nav-tabs" role="tablist">
-					<li role="presentation" class="<?= empty($tabRegister) ? ' active' : '' ?>">
-						<a href="#form-login" aria-controls="form-login" role="tab" data-toggle="tab">Login</a>
+					<li role="presentation" class="nav-item">
+						<a href="#form-login" class="nav-link<?= empty($tabRegister) ? ' active' : '' ?>" aria-controls="form-login" role="tab" data-toggle="tab">Login</a>
 					</li>
-					<li role="presentation" class="<?= isset($tabRegister) ? 'active' : '' ?>">
-						<a href="#form-register" aria-controls="form-register" role="tab" data-toggle="tab">Cadastrar</a>
+					<li role="presentation" class="nav-item">
+						<a href="#form-register" class="nav-link<?= isset($tabRegister) ? 'active' : '' ?>" aria-controls="form-register" role="tab" data-toggle="tab">Cadastrar</a>
 					</li>
 				</ul>
 			</div>
-			<div class="panel-body tab-content">
-				<div class="tab-pane<?= empty($tabRegister) ? ' active' : '' ?>" role="tabpanel" id="form-login">
+			<div class="card-body tab-content">
+				<div class="tab-pane<?= empty($tabRegister) ? ' active' : '' ?>" role="tabcard" id="form-login">
 					<form class="form-horizontal" action="<?= $baseUrl ?>/login" method="post">
-						<div class="form-group">
-							<label class="col-md-2 control-label">E-mail</label>
+						<div class="form-group row">
+							<label class="col-md-2 col-form-label">E-mail</label>
 							<div class="col-md-10">
 								<input type="text" class="form-control" name="username" value="<?= isset($username) ? $this->e($username) : '' ?>"/>
 							</div>
 						</div>
-						<div class="form-group">
-							<label class="col-md-2 control-label">Senha</label>
+						<div class="form-group row">
+							<label class="col-md-2 col-form-label">Senha</label>
 							<div class="col-md-10">
 								<input type="password" class="form-control" name="password"/>
 							</div>
 						</div>
-						<div class="form-group">
-							<div class="col-md-offset-2 col-md-10">
-								<button type="submit">Entrar</button>
+						<div class="form-group row mb-0">
+							<label class="col-md-2 col-form-label"></label>
+							<div class="col-md-10">
+								<button type="submit" class="btn btn-primary">Entrar</button>
 							</div>
 						</div>
 					</form>
 				</div>
-				<div class="tab-pane<?= isset($tabRegister) ? ' active' : '' ?>" role="tabpanel" id="form-register">
+				<div class="tab-pane<?= isset($tabRegister) ? ' active' : '' ?>" role="tabcard" id="form-register">
 <?php if (!empty($register_success)): ?>
 					<div class="alert alert-success" role="alert">
 						<p><strong>Cadastro realizado com sucesso!</strong></p>
@@ -52,38 +53,39 @@
 					<p>Você receberá um aviso por e-mail quando isso acontecer.</p>
 <?php else: ?>
 					<form class="form-horizontal" action="<?= $baseUrl ?>/usuario/cadastrar" method="post">
-						<div class="form-group">
-							<label class="col-md-4 control-label">Nome</label>
+						<div class="form-group row">
+							<label class="col-md-4 col-form-label">Nome</label>
 							<div class="col-md-8">
 								<input type="text" class="form-control" name="name" value="<?= isset($register_name) ? $this->e($register_name) : '' ?>"/>
 							</div>
 						</div>
-						<div class="form-group">
-							<label class="col-md-4 control-label">E-mail</label>
+						<div class="form-group row">
+							<label class="col-md-4 col-form-label">E-mail</label>
 							<div class="col-md-8">
 								<input type="text" class="form-control" name="email" value="<?= isset($register_email) ? $this->e($register_email) : '' ?>"/>
 							</div>
 						</div>
-						<div class="form-group">
-							<label class="col-md-4 control-label">Senha</label>
+						<div class="form-group row">
+							<label class="col-md-4 col-form-label">Senha</label>
 							<div class="col-md-8">
 								<input type="password" class="form-control" name="password" value="<?= isset($register_password) ? $this->e($register_password) : '' ?>"/>
 							</div>
 						</div>
-						<div class="form-group">
-							<label class="col-md-4 control-label">Confirme a senha</label>
+						<div class="form-group row">
+							<label class="col-md-4 col-form-label">Confirme a senha</label>
 							<div class="col-md-8">
 								<input type="password" class="form-control" name="password_confirm"/>
 							</div>
 						</div>
-						<div class="form-group">
+						<div class="form-group row mb-0">
 <?php if (isset($register_error)): ?>
 							<div class="alert alert-danger" role="alert">
 								<p><?= $this->e($register_error) ?></p>
 							</div>
 <?php endif; ?>
-							<div class="col-md-offset-4 col-md-8">
-								<button type="submit">Enviar</button>
+							<label class="col-md-4 col-form-label"></label>
+							<div class="col-md-8">
+								<button type="submit" class="btn btn-primary">Enviar</button>
 							</div>
 						</div>
 					</form>
