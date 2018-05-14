@@ -24,7 +24,7 @@ RECAM.comp['generic/tab-panel'] = {
 			default() {}
 		}*/
 	},
-	data() {
+	data: function() {
 		return {
 			// id: '',
 			header: '',
@@ -33,8 +33,8 @@ RECAM.comp['generic/tab-panel'] = {
 	},
 	computed: {
 		active: {
-			get() { return this.$data._active; },
-			set(val) {
+			get: function() { return this.$data._active; },
+			set: function(val) {
 				this.$data._active = val;
 				//if ( val ) {
 					// this.onSelected();
@@ -43,26 +43,26 @@ RECAM.comp['generic/tab-panel'] = {
 				this.$emit('tab-activate', !!val);
 			}
 		},
-		show () {
+		show: function() {
 			return this.$data._active;
 		},
-		transition () {
+		transition: function() {
 			return this.$parent.transition;
 		}
 	},
-	created() {
+	created: function() {
 		this.$on('is-active?', function() {
 			//console.log('tab-panel:is-active');
 			this.active = this.$data._active;
 		});
 	},
-	beforeMount() {
+	beforeMount: function() {
 		this.$parent.registerTab(this);
 	},
-	beforeDestroy() {
+	beforeDestroy: function() {
 		this.$parent.removeTab(this);
 	},
-	mounted() {
+	mounted: function() {
 		// Support Header element
 		var headerElem = this.$slots.header;
 		if ( headerElem ) {

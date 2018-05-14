@@ -45,16 +45,16 @@ RECAM.comp['generic/tab-control'] = {
 			default: 'card-body tab-content'
 		}
 	},
-	data() {
+	data: function() {
 		return {
 			tabs: []
 		};
 	},
 	methods: {
-		orientationClass() {
+		orientationClass: function() {
 			return 'tabs-' + this.orientation;
 		},
-		activateTab(index) {
+		activateTab: function(index) {
 			var tab = this.tabs[index];
 
 			if ( tab && !tab.disabled ) {
@@ -64,26 +64,26 @@ RECAM.comp['generic/tab-control'] = {
 					index = this.tabs.length - 1;
 				} // end if
 
-				this.tabs.forEach((tab, idx) => {
+				this.tabs.forEach(function(tab, idx) {
 					tab.active = idx === index;
 				});
 			} // end if
 		},
-		ensureActiveTab() {
+		ensureActiveTab: function() {
 			var activeTab = 0;
-			this.tabs.forEach((tab, index) => {
+			this.tabs.forEach(function(tab, index) {
 				if ( tab.active ) {
 					activeTab = index;
 				} // end if
 			});
 			this.activateTab(activeTab);
 		},
-		registerTab(tab) {
+		registerTab: function(tab) {
 			tab.id = this.tabs.length;
 			this.tabs.push(tab);
 			this.ensureActiveTab();
 		},
-		removeTab(tab) {
+		removeTab: function(tab) {
 			if(this && this.tabs && this.tabs.$remove)
 				this.tabs.$remove(tab);
 			this.ensureActiveTab();

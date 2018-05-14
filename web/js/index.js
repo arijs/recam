@@ -33,7 +33,7 @@ Vue.component('masked-input', vueTextMask.default);
 
 Vue.component('vnode', {
 	functional: true,
-	render(h, context){
+	render: function(h, context){
 		return context.props.node;
 	}
 });
