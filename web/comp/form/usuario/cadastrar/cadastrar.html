@@ -1,0 +1,70 @@
+<div class="recam--form--usuario--cadastrar">
+
+	<div v-if="sucesso">
+		<div class="alert alert-success" role="alert">
+			<p><strong>Cadastro realizado com sucesso!</strong></p>
+		</div>
+		<p>O administrador irá verificar seus dados e realizar a liberação de acesso.</p>
+		<p>Você receberá um aviso por e-mail quando isso acontecer.</p>
+	</div>
+	<form v-else class="form-horizontal" action="javascript:;" v-on:submit="clickSubmit">
+		<div class="form-group row">
+			<!-- <label class="col-md-4 col-form-label">Nome</label> -->
+			<div class="col-md-12">
+				<!-- <input type="text" class="form-control" name="name" value="<?= isset($register_name) ? $this->e($register_name) : '' ?>"/> -->
+				<recam--form-campo--texto
+					v-bind:campo="campos.nome"
+					v-on:focus="campoFocus"
+					v-on:blur="campoBlur(campos.nome)"
+					ref="nome"
+				></recam--form-campo--texto>
+			</div>
+		</div>
+		<div class="form-group row">
+			<!-- <label class="col-md-4 col-form-label">E-mail</label> -->
+			<div class="col-md-12">
+				<!-- <input type="text" class="form-control" name="email" value="<?= isset($register_email) ? $this->e($register_email) : '' ?>"/> -->
+				<recam--form-campo--texto
+					v-bind:campo="campos.email"
+					v-on:focus="campoFocus"
+					v-on:blur="campoBlur(campos.email)"
+					ref="email"
+				></recam--form-campo--texto>
+			</div>
+		</div>
+		<div class="form-group row">
+			<!-- <label class="col-md-4 col-form-label">Senha</label> -->
+			<div class="col-md-12">
+				<!-- <input type="password" class="form-control" name="password" value="<?= isset($register_password) ? $this->e($register_password) : '' ?>"/> -->
+				<recam--form-campo--texto
+					v-bind:campo="campos.senha"
+					v-on:focus="campoFocus"
+					v-on:blur="campoBlur(campos.senha)"
+					ref="senha"
+				></recam--form-campo--texto>
+			</div>
+		</div>
+		<div class="form-group row">
+			<!-- <label class="col-md-4 col-form-label">Confirme a senha</label> -->
+			<div class="col-md-12">
+				<!-- <input type="password" class="form-control" name="password_confirm"/> -->
+				<recam--form-campo--texto
+					v-bind:campo="campos.senhaConfirmacao"
+					v-on:focus="campoFocus"
+					v-on:blur="campoBlur(campos.senhaConfirmacao)"
+					ref="senhaConfirmacao"
+				></recam--form-campo--texto>
+			</div>
+		</div>
+		<div v-if="erro" class="alert alert-danger" role="alert">
+			<p class="mb-0" v-text="erro"></p>
+		</div>
+		<div class="form-group row mb-0">
+			<!-- <label class="col-md-4 col-form-label"></label> -->
+			<div class="col-md-12">
+				<button type="submit" class="btn btn-primary">Enviar</button>
+			</div>
+		</div>
+	</form>
+
+</div>

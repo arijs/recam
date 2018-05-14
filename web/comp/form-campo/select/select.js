@@ -1,8 +1,8 @@
 (function() {
 
-var Utils = OiMPSAC.Utils;
+var Utils = RECAM.Utils;
 
-OiMPSAC.comp['form-campo/select'] = {
+RECAM.comp['form-campo/select'] = {
   props: {
     campo: {
       type: Object,

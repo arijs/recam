@@ -1,0 +1,25 @@
+<div class="recam--generic--tab-control" v-bind:class="[classControl]">
+	<div v-bind:class="[classHeader]">
+		<ul v-bind:class="[classHeaderList]" role="tablist">
+			<slot name="header-begin"></slot>
+			<li v-for="(tab, $index) in tabs"
+				v-bind:class="[classHeaderItem]">
+				<a href="javascript:;"
+					v-bind:class="[
+						classHeaderLink,
+						tab.active ? classHeaderLinkActive : '',
+						tab.disabled ? classHeaderLinkDisabled : ''
+					]"
+					role="tab"
+					data-toggle="tab"
+					v-on:click.prevent="activateTab($index)">
+					<vnode v-bind:node="tab.header"></vnode>
+				</a>
+			</li>
+			<slot name="header-end"></slot>
+		</ul>
+	</div>
+	<div v-bind:class="[classBody]">
+		<slot></slot>
+	</div>
+</div>

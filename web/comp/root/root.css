@@ -1,6 +1,9 @@
 .recam--root {
 	height: 100%;
 }
+.recam--root .bg-page {
+	background: #707080;
+}
 .recam--root .desktop-block {
 	display: block;
 }
@@ -137,7 +140,8 @@
 	width: 100%;
 	border: none;
 	padding: 0;
-	font-family: 'Simplon BP';
+	/* font-family: 'Simplon BP'; */
+	font-family: sans-serif;
 	font-size: 20px;
 	color: #222;
 	background: transparent;

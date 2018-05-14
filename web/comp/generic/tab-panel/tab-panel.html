@@ -1,0 +1,7 @@
+<div class="recam--generic--tab-panel"
+	role="tabpanel"
+	v-show="show"
+	v-bind:class="[panelClass, active ? activeClass : '']"
+	v-bind:transition="transition">
+	<slot></slot>
+</div>

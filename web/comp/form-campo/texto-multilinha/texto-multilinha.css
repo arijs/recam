@@ -1,15 +1,15 @@
-.oimpsac--form-campo--texto-multilinha {}
-.oimpsac--form-campo--texto-multilinha .campo-border {
+.recam--form-campo--texto-multilinha {}
+.recam--form-campo--texto-multilinha .campo-border {
 	height: auto;
 }
-.oimpsac--form-campo--texto-multilinha.campo-focused .campo-label {
+.recam--form-campo--texto-multilinha.campo-focused .campo-label {
 	top: 10px;
 	font-size: 12px;
 }
-.oimpsac--form-campo--texto-multilinha .campo-value {
+.recam--form-campo--texto-multilinha .campo-value {
 	padding: 30px 16px 4px 22px;
   height: auto;
 }
-.oimpsac--form-campo--texto-multilinha .campo-value textarea {
+.recam--form-campo--texto-multilinha .campo-value textarea {
 	resize: vertical;
 }

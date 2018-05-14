@@ -31,6 +31,13 @@ Vue.mixin({
 
 Vue.component('masked-input', vueTextMask.default);
 
+Vue.component('vnode', {
+	functional: true,
+	render(h, context){
+		return context.props.node;
+	}
+});
+
 Vue.options.componentDynamic('recam--root')(
 	function(compRoot) {
 		compRoot.store = RECAM.store;

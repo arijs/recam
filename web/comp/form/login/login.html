@@ -1,0 +1,39 @@
+<div class="recam--form--login">
+
+	<form class="form-horizontal" action="javascript:;" method="post" v-on:submit.prevent="clickSubmit">
+		<div class="form-group row">
+			<!-- <label class="col-md-2 col-form-label">E-mail</label> -->
+			<div class="col-md-12">
+				<!-- <input type="text" class="form-control" name="username" value="<?= isset($username) ? $this->e($username) : '' ?>"/> -->
+				<recam--form-campo--texto
+					v-bind:campo="campos.login"
+					v-on:focus="campoFocus"
+					v-on:blur="campoBlur(campos.login)"
+					ref="login"
+				></recam--form-campo--texto>
+			</div>
+		</div>
+		<div class="form-group row">
+			<!-- <label class="col-md-2 col-form-label">Senha</label> -->
+			<div class="col-md-12">
+				<!-- <input type="password" class="form-control" name="password"/> -->
+				<recam--form-campo--texto
+					v-bind:campo="campos.senha"
+					v-on:focus="campoFocus"
+					v-on:blur="campoBlur(campos.senha)"
+					ref="senha"
+				></recam--form-campo--texto>
+			</div>
+		</div>
+		<div v-if="erro" class="alert alert-danger" role="alert">
+			<p class="mb-0" v-text="erro"></p>
+		</div>
+		<div class="form-group row mb-0">
+			<!-- <label class="col-md-2 col-form-label"></label> -->
+			<div class="col-md-12">
+				<button type="submit" class="btn btn-primary">Entrar</button>
+			</div>
+		</div>
+	</form>
+
+</div>

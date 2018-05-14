@@ -1,4 +1,4 @@
-<div class="oimpsac--form-campo--texto oimpsac--form-campo--base"
+<div class="recam--form-campo--texto recam--form-campo--base"
 	v-bind:class="cssClass"
 	v-on:click="campoClick"
 >
@@ -11,8 +11,8 @@
 			<template v-if="campo.mask">
 				<masked-input
 					ref="inputMask"
-					v-bind:type="campo.type"
-					v-bind:name="campo.name"
+					v-bind:type="campo.tipo"
+					v-bind:name="campo.nome"
 					v-bind:value="campo.valor"
 					v-bind:placeholder="campo.placeholder"
 					v-bind:disabled="campo.disabled"
@@ -31,8 +31,8 @@
 			<template v-else>
 				<input
 					ref="input"
-					v-bind:type="campo.type"
-					v-bind:name="campo.name"
+					v-bind:type="campo.tipo"
+					v-bind:name="campo.nome"
 					v-bind:value="campo.valor"
 					v-bind:placeholder="campo.placeholder"
 					v-bind:disabled="campo.disabled"

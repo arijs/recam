@@ -1,5 +1,5 @@
-.oimpsac--form-campo--texto {}
-.oimpsac--form-campo--texto.campo-focused .campo-label {
+.recam--form-campo--texto {}
+.recam--form-campo--texto.campo-focused .campo-label {
 	top: 10px;
 	font-size: 12px;
 }

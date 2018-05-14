@@ -1,6 +1,6 @@
 (function() {
 
-OiMPSAC.comp['form-campo/texto-multilinha'] = {
+RECAM.comp['form-campo/texto-multilinha'] = {
   props: {
     campo: {
       type: Object,
@@ -60,9 +60,9 @@ OiMPSAC.comp['form-campo/texto-multilinha'] = {
       } else if (evt && evt.target && 'string' === typeof evt.target.value) {
         valor = evt.target.value;
       }
-      this.$store.commit('setFormCampoValue', {
+      this.$store.commit('setFormCampoValor', {
         campo: this.campo,
-        value: valor
+        valor: valor
       });
       this.$emit('input', evt);
     },
