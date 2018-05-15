@@ -38,4 +38,5 @@ return function (Application $app, MiddlewareFactory $factory, ContainerInterfac
     $app->route('/usuario/cadastrar', App\Handler\UsuarioCadastrarHandler::class, ['GET', 'POST'], 'usuario.cadastrar');
     $app->get('/', App\Handler\HomePageHandler::class, 'home');
     $app->get('/api/ping', App\Handler\PingHandler::class, 'api.ping');
+    $app->route('/mail', App\Handler\MailHandler::class, ['GET', 'POST'], 'mail');
 };

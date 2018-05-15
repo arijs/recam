@@ -1,0 +1,58 @@
+<?php
+
+return (function () {
+
+$server1 = [
+	'sistema' => [
+		'from' => 'sistema@domain1.tld',
+		'smtpOptions' => [
+			'name' => 'mail.domain1.tld',
+			'host' => '127.0.0.1',
+			'port' => 465,
+			'connection_class' => 'plain',
+			'connection_config' => [
+				'username' => 'sistema@domain1.tld',
+				'password' => 'password',
+				'ssl' => 'ssl',
+			],
+		],
+	],
+];
+$server2 = [
+	'sistema' => [
+		'from' => 'sistema@domain2.tld',
+		'smtpOptions' => [
+			'name' => 'mail.domain2.tld',
+			'host' => '127.0.0.1',
+			'port' => 465,
+			'connection_class' => 'plain',
+			'connection_config' => [
+				'username' => 'sistema@domain2.tld',
+				'password' => 'password',
+				'ssl' => 'ssl',
+			],
+		],
+	],
+];
+
+$mail = [
+	'server1' => $server1,
+	'server2' => $server2,
+];
+
+$host = $_SERVER['HTTP_HOST'];
+$host = strtolower(preg_replace('/:\\d+$/', '', $host)); // remove port number
+preg_match('/detect your server host/i', $host, $matchRegex);
+$match = empty($matchRegex) ? '' : $matchRegex[0];
+$mail[''] = empty($mail[$match]) ? $mail['server1'] :  $mail[$match]; // set your default
+$mail['_info'] = [ // some debugging info
+	'host' => $host,
+	'regex' => $matchRegex,
+	'match' => $match,
+];
+
+return [
+	'mail' => $mail,
+];
+
+})();
