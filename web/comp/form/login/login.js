@@ -9,6 +9,9 @@ RECAM.comp['form/login'] = {
 		},
 		erro: function() {
 			return this.$store.state.formLoginErro;
+		},
+		postLoginLoading: function() {
+			return this.$store.state.servicePostLoginLoading;
 		}
 	},
 	methods: {
@@ -30,7 +33,27 @@ RECAM.comp['form/login'] = {
 		clickSubmit: function() {
 			var context = this.$store;
 			context.dispatch('validarForm', this.campos).then(function(result) {
-				context.commit('setFormLoginErro', result.erroMensagem);
+				var erro = result.erroMensagem;
+				context.commit('setFormLoginErro', erro);
+				if (!erro) {
+					context.dispatch('loadPostLogin').then(function() {
+						var data = context.state.servicePostLogin;
+						var error = context.state.servicePostLoginError;
+						console.log('postLogin', error, data);
+						if (error) {
+							var errorList = [];
+							if (error.errorFields) {
+								Utils.forEachProperty(error.errorFields, function(elist) {
+									errorList = errorGroup.concat(elist || []);
+								});
+							}
+							if (!errorList.length) {
+								errorList.push(error.message || 'Erro ao fazer o login. Tente novamente mais tarde.');
+							}
+							context.commit('setFormLoginErro', errorList.join(' / '));
+						}
+					});
+				}
 			});
 		}
 	}

@@ -14,7 +14,7 @@ var state = {
 	query: query,
 	pageScroll: [0, 0],
 	screen: null,
-	usuario: null,
+	session: null,
 	formLogin: {
 		login: {
 			nome: 'login',
@@ -88,10 +88,91 @@ var state = {
 			]
 		}
 	},
-	formUsuarioCadastrarErro: null
+	formUsuarioCadastrarErro: null,
+	serviceGetLogin: null,
+	serviceGetLoginLoading: false,
+	serviceGetLoginError: null,
+	servicePostLogin: null,
+	servicePostLoginLoading: false,
+	servicePostLoginError: null,
+	serviceLogout: null,
+	serviceLogoutLoading: false,
+	serviceLogoutError: null,
 };
-var getters = {};
+var getters = {
+	getPostLoginRequestData: function(state, getters) {
+		return function() {
+			return {
+				username: state.formLogin.login.valor,
+				password: state.formLogin.senha.valor
+			};
+		};
+	}
+};
 var actions = {
+	loadGetLogin: function(context) {
+		return new Promise(function(resolve, reject) {
+			context.commit('setGetLoginError', null);
+			context.commit('setGetLogin', null);
+			services.getLogin(
+				null,
+				function(loading, error, data) {
+					context.commit('setGetLoginLoading', loading);
+					if (loading) return;
+					if (error) {
+						context.commit('setGetLoginError', error);
+						resolve();
+					} else {
+						context.commit('setGetLogin', data);
+						context.commit('setSession', data.session);
+						resolve();
+					}
+				}
+			);
+		});
+	},
+	loadPostLogin: function(context) {
+		return new Promise(function(resolve, reject) {
+			context.commit('setPostLoginError', null);
+			context.commit('setPostLogin', null);
+			services.postLogin(
+				context.getters.getPostLoginRequestData(),
+				function(loading, error, data) {
+					context.commit('setPostLoginLoading', loading);
+					if (loading) return;
+					if (error) {
+						context.commit('setPostLoginError', error);
+						resolve();
+					} else {
+						context.commit('setPostLogin', data);
+						context.commit('setSession', data.session);
+						resolve();
+					}
+				}
+			);
+		});
+	},
+	loadLogout: function(context) {
+		context.commit('setLogoutError', null);
+		context.commit('setLogout', null);
+		return new Promise(function(resolve, reject) {
+			services.logout(
+				null,
+				function(loading, error, data) {
+					context.commit('setLogoutLoading', loading);
+					if (loading) return;
+					if (error) {
+						context.commit('setLogoutError', error);
+						resolve();
+					} else {
+						context.commit('setLogout', data);
+						context.commit('setSession', data.session);
+						resolve();
+					}
+				}
+			);
+		});
+	},
 	testaCampo: function(context, campo) {
 		var validacao = null;
 		if (campo.valida) {
@@ -155,13 +236,40 @@ var actions = {
 	}
 };
 var mutations = {
+	setGetLogin: function(state, data) {
+		state.serviceGetLogin = data;
+	},
+	setGetLoginLoading: function(state, loading) {
+		state.serviceGetLoginLoading = loading;
+	},
+	setGetLoginError: function(state, error) {
+		state.serviceGetLoginError = error;
+	},
+	setPostLogin: function(state, data) {
+		state.servicePostLogin = data;
+	},
+	setPostLoginLoading: function(state, loading) {
+		state.servicePostLoginLoading = loading;
+	},
+	setPostLoginError: function(state, error) {
+		state.servicePostLoginError = error;
+	},
+	setLogout: function(state, data) {
+		state.serviceLogout = data;
+	},
+	setLogoutLoading: function(state, loading) {
+		state.serviceLogoutLoading = loading;
+	},
+	setLogoutError: function(state, error) {
+		state.serviceLogoutError = error;
+	},
 	setPageScroll: function(state, ps) {
 		var sps = state.pageScroll;
 		if (ps[0] != null && !isNaN(+ps[0])) sps[0] = ps[0];
 		if (ps[1] != null && !isNaN(+ps[1])) sps[1] = ps[1];
 	},
-	setScreen: function(state, screen) {
-		state.screen = screen;
+	setSession: function(state, session) {
+		state.session = session;
 	},
 	setFormCampoValor: function(state, payload) {
 		payload.campo.valor = payload.valor;

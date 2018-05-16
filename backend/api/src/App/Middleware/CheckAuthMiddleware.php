@@ -10,7 +10,6 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Zend\Authentication\AuthenticationService;
 use Zend\Diactoros\Response\RedirectResponse;
-use \App\InjectAuthMiddleware;
 
 class CheckAuthMiddleware implements MiddlewareInterface
 {

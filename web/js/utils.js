@@ -126,6 +126,20 @@ Utils.parseQuery = function parseQuery(param) {
 	return obj;
 };
 
+Utils.stringifyQuery = function stringifyQuery(param) {
+	var arr = [];
+	for ( var key in param ) {
+		if ( hop.call(param, key) ) {
+			var pair = [
+				window.encodeURIComponent(key),
+				window.encodeURIComponent(String(param[key]))
+			];
+			arr.push(pair.join('='));
+		}
+	}
+	return arr.join('&');
+};
+
 Utils.debounce = function debounce(fn, wait) {
 	function cancel() {
 		_iv && clearTimeout(_iv);
@@ -229,6 +243,25 @@ Utils.iso8601Date = function iso8601Date(date) {
 		Utils.padStart(String(date.getDate()), 2, '0'),
 	].join('-');
 };
+
+Utils.printModelDate = function printModelDate(date) {
+	var result = [];
+	if (date.year != null && date.year !== false) {
+		result.push([
+			Utils.padStart(String(date.day), 2, '0'),
+			Utils.padStart(String(date.month), 2, '0'),
+			Utils.padStart(String(date.year), 4, '0'),
+		].join('/'));
+	}
+	if (date.hour != null && date.hour !== false) {
+		result.push([
+			Utils.padStart(String(date.hour), 2, '0'),
+			Utils.padStart(String(date.minute), 2, '0'),
+			Utils.padStart(String(date.second), 2, '0'),
+		].join(':'));
+	}
+	return result.join(' ');
+}
 
 Utils.loadScript = function loadScript(url, cb) {
 	var script = document.createElement('script');
@@ -1035,7 +1068,7 @@ Utils.componentDynamic = function componentDynamic(name, href, compMap) {
 		Utils.loadScript(href+'.js', function(err) {
 			if (err) {
 				return reject({
-					message: 'Error loading component '+path+' script',
+					message: 'Error loading component '+href+' script',
 					error: err
 				});
 			}
@@ -1047,7 +1080,7 @@ Utils.componentDynamic = function componentDynamic(name, href, compMap) {
 			cb: function(err, response) {
 				if (err) {
 					return reject({
-						message: 'Error loading component '+path+' template',
+						message: 'Error loading component '+href+' template',
 						error: err
 					});
 				}

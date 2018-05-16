@@ -25,7 +25,7 @@ class MailHandler implements RequestHandlerInterface
     public function __construct(
         TemplateRendererInterface $renderer,
         TransportInterface $transport,
-        string $sender,
+        array $sender,
         array $info
     )
     {
@@ -41,9 +41,11 @@ class MailHandler implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request) : ResponseInterface
     {
         // Do some work...
+        $sender = $this->mailSender;
         $message = new Message();
+        $message->setEncoding('UTF-8');
         $message->addTo('rhengles@gmail.com');
-        $message->addFrom($this->mailSender);
+        $message->addFrom($sender['address'], $sender['name']);
         $message->setSubject('Teste Email Registro de Campo');
         $message->setBody(
             "Corpo da mensagem - teste\nteste 1\nteste 2\n\nteste 3\n\nteste 4\nteste 5\nteste 6\n\n" .

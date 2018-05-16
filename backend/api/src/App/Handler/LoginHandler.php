@@ -8,6 +8,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Zend\Diactoros\Response\HtmlResponse;
+use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\Response\RedirectResponse;
 use Zend\Expressive\Template\TemplateRendererInterface;
 use Zend\Authentication\AuthenticationService;
@@ -42,6 +43,10 @@ class LoginHandler implements RequestHandlerInterface
         if ($request->getMethod() === 'POST') {
             return $this->authenticate($request);
         }
+        return new JsonResponse([
+            'baseUrl' => $request->getAttribute(\App\Middleware\InjectBaseUrlMiddleware::class),
+            'session' => $request->getAttribute(\App\Middleware\InjectAuthMiddleware::class),
+        ]);
 
         return new HtmlResponse($this->template->render('app::login', [
             'baseUrl' => $request->getAttribute(\App\Middleware\InjectBaseUrlMiddleware::class)
@@ -53,28 +58,49 @@ class LoginHandler implements RequestHandlerInterface
         $params = $request->getParsedBody();
         $username = $params['username'];
         $password = $params['password'];
-        $baseUrl = $request->getAttribute(\App\Middleware\InjectBaseUrlMiddleware::class);
+        $error_username = [];
+        $error_password = [];
 
         if (empty($username)) {
-            return new HtmlResponse($this->template->render('app::login', [
-                'baseUrl' => $baseUrl,
-                'error' => 'O login não pode estar vazio',
-            ]));
+            // return new HtmlResponse($this->template->render('app::login', [
+            //     'baseUrl' => $baseUrl,
+            //     'error' => 'O login não pode estar vazio',
+            // ]))
+            $error_username[] = 'O login não pode estar vazio';
         }
 
         if (empty($password)) {
-            return new HtmlResponse($this->template->render('app::login', [
-                'baseUrl' => $baseUrl,
-                'username' => $username,
-                'error'    => 'A senha não pode estar vazia',
-            ]));
+            // return new HtmlResponse($this->template->render('app::login', [
+            //     'baseUrl' => $baseUrl,
+            //     'username' => $username,
+            //     'error'    => 'A senha não pode estar vazia',
+            // ]));
+            $error_password[] = 'A senha não pode estar vazia';
         }
 
-        $this->authAdapter->setUsername($username);
-        $this->authAdapter->setPassword($password);
+        $session = null;
+        $tried = false;
+        if (empty($error_username) && empty($error_password)) {
+            $this->authAdapter->setUsername($username);
+            $this->authAdapter->setPassword($password);
 
-        $result = $this->auth->authenticate();
-        if (!$result->isValid()) {
+            $result = $this->auth->authenticate();
+            $tried = true;
+            if ($result->isValid()) {
+                $session = $result->getIdentity();
+            } else {
+                $error_password = $result->getMessages();
+            }
+        }
+        $errors = [];
+        if (!empty($error_username)) $errors['username'] = $error_username;
+        if (!empty($error_password)) $errors['password'] = $error_password;
+        return new JsonResponse([
+            'baseUrl' => $request->getAttribute(\App\Middleware\InjectAuthMiddleware::class),
+            'session' => $session,
+            'errorFields' => empty($errors) ? null : $errors,
+        ]);
+        /* if (!$result->isValid()) {
             $msgs = $result->getMessages();
             if (empty($msgs)) {
                 $msgs = 'Usuario ou senha inválidos';
@@ -87,6 +113,6 @@ class LoginHandler implements RequestHandlerInterface
                 'error'    => $msgs,
             ]));
         }
-        return new RedirectResponse($baseUrl.'/');
+        return new RedirectResponse($baseUrl.'/'); */
     }
 }

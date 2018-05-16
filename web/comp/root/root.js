@@ -4,8 +4,11 @@ var Utils = RECAM.Utils;
 
 RECAM.comp['root'] = {
 	computed: {
-		usuario: function() {
-			return this.$store.state.usuario;
+		getLoginLoading: function() {
+			return this.$store.state.serviceGetLoginLoading;
+		},
+		session: function() {
+			return this.$store.state.session;
 		}
 	}
 };

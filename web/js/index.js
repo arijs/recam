@@ -56,6 +56,7 @@ Vue.options.componentDynamic('recam--root')(
 	}
 );
 
-RECAM.store.commit('setScreen', 1);
+RECAM.store.dispatch('loadGetLogin');
+// RECAM.store.commit('setScreen', 1);
 
 })();

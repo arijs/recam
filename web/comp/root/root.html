@@ -1,5 +1,8 @@
 <div class="recam--root">
   <!-- <h1>Registro de Campo</h1> -->
-  <recam--logado v-if="usuario"></recam--logado>
+  <div class="session-loading" v-if="getLoginLoading">
+    <p>Carregando...</p>
+  </div>
+  <recam--logado v-else-if="session"></recam--logado>
   <recam--nao-logado v-else></recam--nao-logado>
 </div>

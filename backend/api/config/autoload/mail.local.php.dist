@@ -4,7 +4,10 @@ return (function () {
 
 $server1 = [
 	'sistema' => [
-		'from' => 'sistema@domain1.tld',
+		'from' => [
+			'address' => 'sistema@domain1.tld',
+			'name' => 'Registro de Campo',
+		],
 		'smtpOptions' => [
 			'name' => 'mail.domain1.tld',
 			'host' => '127.0.0.1',
@@ -20,7 +23,10 @@ $server1 = [
 ];
 $server2 = [
 	'sistema' => [
-		'from' => 'sistema@domain2.tld',
+		'from' => [
+			'address' => 'sistema@domain2.tld',
+			'name' => 'Registro de Campo',
+		],
 		'smtpOptions' => [
 			'name' => 'mail.domain2.tld',
 			'host' => '127.0.0.1',

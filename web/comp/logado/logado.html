@@ -1,12 +1,23 @@
-<div class="recam--logado">
+<div class="recam--logado py-3" style="min-height: 100%">
 
-	<div class="row">
-		<div class="col-md-3">
+	<div class="row justify-content-center mx-0">
+		<div class="col-md-6 col-lg-4">
 			<div class="list-group">
-				<span class="list-group-item">Olá, {{usuario.nome}}</span>
-				<a class="list-group-item" href="javascript:;" v-on:click="clickLogout">Logout</a>
+				<span class="list-group-item">Olá, {{usuario.usuario_nome}}!</span>
+				<span class="list-group-item">E-mail: {{usuario.usuario_email}}</span>
+				<span class="list-group-item">Registrado em: {{printModelDate(usuario.usuario_registro)}}</span>
+				<span class="list-group-item">Autorizado em: {{printModelDate(usuario.usuario_autorizado)}}</span>
+				<span class="list-group-item">Você acessou {{1 === acesso.acesso_contagem ? '1 vez' : acesso.acesso_contagem+' vezes'}} em {{printModelDate(acesso.acesso_data)}}</span>
+				<span class="list-group-item">Primeiro horário: {{printModelDate(acesso.acesso_hora_inicial)}}</span>
+				<span class="list-group-item">Último horário: {{printModelDate(acesso.acesso_hora_final)}}</span>
+				<span v-if="logoutLoading" class="list-group-item">Aguarde, fazendo logout...</span>
+				<a href="javascript:;" v-else class="list-group-item" v-on:click="clickLogout">Logout</a>
 			</div>
 		</div>
 	</div>
+
+	<pre v-show="false">
+{{ JSON.stringify(session, null, '\t') }}
+	</pre>
 
 </div>

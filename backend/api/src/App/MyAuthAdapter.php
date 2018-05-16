@@ -70,6 +70,8 @@ class MyAuthAdapter implements AdapterInterface
             }
         }
 
-        return new Result(Result::FAILURE_CREDENTIAL_INVALID, $u);
+        return new Result(Result::FAILURE_CREDENTIAL_INVALID, $u, [
+            'Login ou senha inválidos'
+        ]);
     }
 }
