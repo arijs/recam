@@ -18,14 +18,15 @@ RECAM.comp['form-campo/texto'] = {
   data: function() {
     return {
       // valor: this.campo.valor,
-      focused: false
+      focused: false,
+      autofill: false
     }
   },
   computed: {
     cssClass: function() {
       var campo = this.campo;
       return {
-        'campo-filled': campo.valor,
+        'campo-filled': campo.valor || this.autofill,
         'campo-focused': this.focused,
         'campo-missing': campo.falta,
         'campo-error': campo.erro
@@ -69,6 +70,20 @@ RECAM.comp['form-campo/texto'] = {
         valor: valor
       });
       this.$emit('input', evt);
+    },
+    onAnimationStart: function(evt) {
+      switch (evt.animationName) {
+        case 'onAutoFillStart':
+          this.onAutoFill(true); break;
+        case 'onAutoFillCancel':
+          this.onAutoFill(false); break;
+      }
+      this.$emit('animationstart', evt);
+      console.log('animationstart', evt, this.autofill, this.cssClass);
+    },
+    onAutoFill: function(af) {
+      this.autofill = af;
+      this.$emit('autofill', af);
     },
     campoClick: function(event) {
       var input = this.campo.mask ? this.$refs.inputMask.$el : this.$refs.input;

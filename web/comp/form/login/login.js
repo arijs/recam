@@ -55,7 +55,29 @@ RECAM.comp['form/login'] = {
 					});
 				}
 			});
+		},
+		detectSavedLogin: function(count) {
+			var login = this.$refs.login;
+			var senha = this.$refs.senha;
+			login && (login = login.$refs.input);
+			senha && (senha = senha.$refs.input);
+			login && (login = login.value);
+			senha && (senha = senha.value);
+			var any = login || senha;
+			any && console.log('formLogin values', count, login, senha);
+			return any;
 		}
+	},
+	mounted: function() {
+		// var detect = this.detectSavedLogin;
+		// var count = 0;
+		// var vm = this;
+		// var recursive = function() {
+		// 	count++;
+		// 	var result = detect(count);
+		// 	if (!result) vm.$nextTick(recursive);
+		// }
+		// recursive();
 	}
 };
 

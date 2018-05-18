@@ -220,3 +220,19 @@
 	0% { transform: rotateZ(0deg); }
 	100% { transform: rotateZ(360deg); }
 }
+
+@keyframes onAutoFillStart { from {/**/} to {/**/} }
+@keyframes onAutoFillCancel { from {/**/} to {/**/} }
+input:-webkit-autofill {
+    /* Expose a hook for JavaScript when autofill is shown
+    // JavaScript can capture 'animationstart' events */
+    animation-name: onAutoFillStart;
+
+    /* Make the background color become yellow really slowly */
+    transition: background-color 9999000s ease-in 0s;
+}
+input:not(:-webkit-autofill) {
+    /* Expose a hook for JS onAutoFillCancel
+    // JavaScript can capture 'animationstart' events */
+    animation-name: onAutoFillCancel;
+}
