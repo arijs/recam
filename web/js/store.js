@@ -84,7 +84,15 @@ var state = {
 			erro: null,
 			falta: false,
 			valida: [
-				valida.naoVazio
+				valida.naoVazio,
+				function(campo, context) {
+					var campoSenha = context.state.formUsuarioCadastrar.senha;
+					if (campo.valor !== campoSenha.valor) {
+						return {
+							erro: 'Erro na confirmação'
+						};
+					}
+				}
 			]
 		}
 	},
@@ -98,6 +106,9 @@ var state = {
 	serviceLogout: null,
 	serviceLogoutLoading: false,
 	serviceLogoutError: null,
+	serviceUsuarioCadastrar: null,
+	serviceUsuarioCadastrarLoading: false,
+	serviceUsuarioCadastrarError: null
 };
 var getters = {
 	getPostLoginRequestData: function(state, getters) {
@@ -105,6 +116,17 @@ var getters = {
 			return {
 				username: state.formLogin.login.valor,
 				password: state.formLogin.senha.valor
+			};
+		};
+	},
+	getUsuarioCadastrarRequestData: function(state, getters) {
+		return function() {
+			var formUC = state.formUsuarioCadastrar;
+			return {
+				name: formUC.nome.valor,
+				email: formUC.email.valor,
+				password: formUC.senha.valor,
+				password_confirm: formUC.senhaConfirmacao.valor
 			};
 		};
 	}
@@ -167,6 +189,26 @@ var actions = {
 					} else {
 						context.commit('setLogout', data);
 						context.commit('setSession', data.session);
+						resolve();
+					}
+				}
+			);
+		});
+	},
+	loadUsuarioCadastrar: function(context) {
+		return new Promise(function(resolve, reject) {
+			context.commit('setUsuarioCadastrarError', null);
+			context.commit('setUsuarioCadastrar', null);
+			services.usuarioCadastrar(
+				context.getters.getUsuarioCadastrarRequestData(),
+				function(loading, error, data) {
+					context.commit('setUsuarioCadastrarLoading', loading);
+					if (loading) return;
+					if (error) {
+						context.commit('setUsuarioCadastrarError', error);
+						resolve();
+					} else {
+						context.commit('setUsuarioCadastrar', data);
 						resolve();
 					}
 				}
@@ -262,6 +304,15 @@ var mutations = {
 	},
 	setLogoutError: function(state, error) {
 		state.serviceLogoutError = error;
+	},
+	setUsuarioCadastrar: function(state, data) {
+		state.serviceUsuarioCadastrar = data;
+	},
+	setUsuarioCadastrarLoading: function(state, loading) {
+		state.serviceUsuarioCadastrarLoading = loading;
+	},
+	setUsuarioCadastrarError: function(state, error) {
+		state.serviceUsuarioCadastrarError = error;
 	},
 	setPageScroll: function(state, ps) {
 		var sps = state.pageScroll;

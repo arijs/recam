@@ -10,7 +10,10 @@ RECAM.comp['form/usuario/cadastrar'] = {
 		erro: function() {
 			return this.$store.state.formUsuarioCadastrarErro;
 		},
-		sucesso: function() {}
+		sucesso: function() {},
+		usuarioCadastrarLoading: function() {
+			return this.$store.state.serviceUsuarioCadastrarLoading;
+		}
 	},
 	methods: {
 		validarCampo: function(campo, callback) {
@@ -31,7 +34,27 @@ RECAM.comp['form/usuario/cadastrar'] = {
 		clickSubmit: function() {
 			var context = this.$store;
 			context.dispatch('validarForm', this.campos).then(function(result) {
+				var erro = result.erroMensagem;
 				context.commit('setFormUsuarioCadastrarErro', result.erroMensagem);
+				if (!erro) {
+					context.dispatch('loadUsuarioCadastrar').then(function() {
+						var data = context.state.serviceUsuarioCadastrar;
+						var error = context.state.serviceUsuarioCadastrarError;
+						console.log('usuarioCadastrar', error, data);
+						if (error) {
+							var errorList = [];
+							if (error.errorFields) {
+								Utils.forEachProperty(error.errorFields, function(elist) {
+									errorList = errorGroup.concat(elist || []);
+								});
+							}
+							if (!errorList.length) {
+								errorList.push(error.message || 'Erro ao fazer o cadastro. Tente novamente mais tarde.');
+							}
+							context.commit('setFormUsuarioCadastrarErro', errorList.join(' / '));
+						}
+					});
+				}
 			});
 		}
 	}

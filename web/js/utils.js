@@ -246,14 +246,14 @@ Utils.iso8601Date = function iso8601Date(date) {
 
 Utils.printModelDate = function printModelDate(date) {
 	var result = [];
-	if (date.year != null && date.year !== false) {
+	if (date && date.year != null && date.year !== false) {
 		result.push([
 			Utils.padStart(String(date.day), 2, '0'),
 			Utils.padStart(String(date.month), 2, '0'),
 			Utils.padStart(String(date.year), 4, '0'),
 		].join('/'));
 	}
-	if (date.hour != null && date.hour !== false) {
+	if (date && date.hour != null && date.hour !== false) {
 		result.push([
 			Utils.padStart(String(date.hour), 2, '0'),
 			Utils.padStart(String(date.minute), 2, '0'),

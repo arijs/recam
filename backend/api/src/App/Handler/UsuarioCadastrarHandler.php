@@ -8,6 +8,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Zend\Diactoros\Response\HtmlResponse;
+use Zend\Diactoros\Response\JsonResponse;
 use Zend\Expressive\Template\TemplateRendererInterface;
 // use Zend\Expressive\Router\RouterInterface;
 use Zend\Validator\EmailAddress;
@@ -39,10 +40,10 @@ class UsuarioCadastrarHandler implements RequestHandlerInterface
             return $this->authenticate($request);
         }
 
-        return new HtmlResponse($this->template->render('app::login', [
+        return new JsonResponse([
             'baseUrl' => $request->getAttribute(\App\Middleware\InjectBaseUrlMiddleware::class),
-            'tabRegister' => true
-        ]));
+            'error' => 'Method not allowed: '.$request->getMethod(),
+        ], 405);
     }
 
     public function authenticate(ServerRequestInterface $request)
@@ -55,7 +56,10 @@ class UsuarioCadastrarHandler implements RequestHandlerInterface
         $password = isset($params['password']) ? $params['password'] : null;
         $password_confirm = isset($params['password_confirm']) ? $params['password_confirm'] : null;
 
-        $error = null;
+        $error_name = [];
+        $error_email = [];
+        $error_password = [];
+        $error_password_confirm = [];
         $register_success = false;
         $emailValidator = new EmailAddress();
 
@@ -63,38 +67,40 @@ class UsuarioCadastrarHandler implements RequestHandlerInterface
             // return new HtmlResponse($this->template->render('app::login', [
             //     'error' => 'The username cannot be empty',
             // ]));
-            $error = 'O nome está vazio!';
+            $error_name[] = 'O nome está vazio!';
         }
 
-        else if (empty($email)) {
-            $error = 'O e-mail está vazio!';
+        if (empty($email)) {
+            $error_email[] = 'O e-mail está vazio!';
         }
 
         else if (!$emailValidator->isValid($email)) {
-            $error = 'O endereço de e-mail é inválido!';
+            $error_email[] = 'O endereço de e-mail é inválido!';
         }
 
         else if ($userEmail = $this->usuarioTable->getUsuarioByEmail($email)) {
-            $error = 'Já existe um usuário com esse e-mail! ('.$userEmail->usuario_nome.')';
+            $error_email[] = 'Já existe um usuário com esse e-mail! ('.$userEmail->usuario_nome.')';
         }
 
-        else if (empty($password)) {
-            // return new HtmlResponse($this->template->render('app::login', [
-            //     'username' => $params['username'],
-            //     'error'    => 'The password cannot be empty',
-            // ]));
-            $error = 'A senha está vazia!';
+        if (empty($password)) {
+            $error_password[] = 'A senha está vazia!';
         }
 
-        else if (empty($password_confirm)) {
-            $error = 'É necessário confirmar a senha!';
+        if (empty($password_confirm)) {
+            $error_password_confirm[] = 'É necessário confirmar a senha!';
         }
 
         else if ($password_confirm !== $password) {
-            $error = 'A senha e a confirmação da senha são diferentes!';
+            $error_password_confirm[] = 'A senha e a confirmação da senha são diferentes!';
         }
 
-        else {
+        $errors = [];
+        if (!empty($error_name)) $errors['name'] = $error_name;
+        if (!empty($error_email)) $errors['email'] = $error_email;
+        if (!empty($error_password)) $errors['password'] = $error_password;
+        if (!empty($error_password_confirm)) $errors['password_confirm'] = $error_password_confirm;
+
+        if (empty($errors)) {
             $usuario = new Usuario();
             $usuario->irmao_id = 0;
             $usuario->usuario_nome = $name;
@@ -104,20 +110,15 @@ class UsuarioCadastrarHandler implements RequestHandlerInterface
             $register_success = true;
         }
 
-        // $result = $this->auth->authenticate();
-        // if (!$result->isValid()) {
-        return new HtmlResponse($this->template->render('app::login', [
-            'baseUrl' => $baseUrl,
-            'tabRegister' => true,
+        return new JsonResponse([
+            'baseUrl' => $request->getAttribute(\App\Middleware\InjectAuthMiddleware::class),
+            'error' => !$register_success,
+            'errorFields' => empty($errors) ? null : $errors,
             'register_name' => $name,
             'register_email' => $email,
-            'register_password' => $password,
+            // 'register_password' => $password,
+            'usuario' => $usuario,
             // 'register_' => $,
-            'register_error' => $error,
-            'register_success' => $register_success,
-        ]));
-        // }
-
-        return new RedirectResponse('/');
+        ], $register_success ? 200 : (empty($errors) ? 500 : 400));
     }
 }

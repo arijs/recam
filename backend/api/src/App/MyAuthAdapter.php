@@ -51,11 +51,11 @@ class MyAuthAdapter implements AdapterInterface
             $up = $usuario->usuario_senha;
             $uaut = $usuario->usuario_autorizado;
             if ($up === $p) {
-                if (empty($uaut)) {
+                /*if (empty($uaut)) {
                     return new Result(Result::FAILURE, $u, [
                         'Sua conta ainda não foi autorizada pelo administrador!',
                     ]);
-                }
+                }*/
                 $acesso = $this->usuarioAcessoTable->getAcessoDeHoje($usuario->usuario_id);
                 if (empty($acesso)) {
                     $acesso = $this->usuarioAcessoTable->criarAcessoDeHoje($usuario->usuario_id);

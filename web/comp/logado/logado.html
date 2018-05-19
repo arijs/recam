@@ -6,7 +6,7 @@
 				<span class="list-group-item">Olá, {{usuario.usuario_nome}}!</span>
 				<span class="list-group-item">E-mail: {{usuario.usuario_email}}</span>
 				<span class="list-group-item">Registrado em: {{printModelDate(usuario.usuario_registro)}}</span>
-				<span class="list-group-item">Autorizado em: {{printModelDate(usuario.usuario_autorizado)}}</span>
+				<span class="list-group-item">Autorizado em: {{usuario.usuario_autorizado ? printModelDate(usuario.usuario_autorizado) : '(autorização pendente)'}}</span>
 				<span class="list-group-item">Você acessou {{1 === acesso.acesso_contagem ? '1 vez' : acesso.acesso_contagem+' vezes'}} em {{printModelDate(acesso.acesso_data)}}</span>
 				<span class="list-group-item">Primeiro horário: {{printModelDate(acesso.acesso_hora_inicial)}}</span>
 				<span class="list-group-item">Último horário: {{printModelDate(acesso.acesso_hora_final)}}</span>

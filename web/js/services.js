@@ -41,8 +41,14 @@ var RECAM = RECAM || {};
 				},
 				dataValidate: function(data) {
 					if (!data || !data.session) {
+						var error = [];
+						if (data && data.errorFields) {
+							Utils.forEachProperty(data.errorFields, function(errorList) {
+								error = error.concat(errorList);
+							});
+						}
 						return {
-							message: 'Login ou senha inválidos',
+							message: error.length ? error.join(' / ') : 'Login ou senha inválidos',
 							error: data && data.error
 						};
 					}
@@ -64,6 +70,45 @@ var RECAM = RECAM || {};
 				}
 			});
 		},
+		usuarioCadastrar: function(req, callback) {
+			Utils.loadService({
+				req: req,
+				envPrepare: Env.Services.usuarioCadastrar,
+				callback: callback,
+				reqValidate: function(req) {
+					if (!req) {
+						return {
+							message: 'Dados do login não informados'
+						};
+					}
+					var fields = {
+						name: 'nome',
+						email: 'e-mail',
+						password: 'senha',
+						password_confirm: 'confirmação da senha'
+					};
+					var missing = [];
+					Utils.forEachProperty(fields, function(text, name) {
+						if (!req[name]) missing.push(text);
+					});
+					if (missing.length) {
+						return {
+							message: (1 === missing.length
+							? 'Campo não informado: '
+							: 'Campos não informados: ') +
+							missing.join(', ')
+						};
+					}
+				},
+				dataValidate: function(data) {
+					if (!data || data.error) {
+						return data || {
+							message: 'Resposta vazia do servidor'
+						};
+					}
+				}
+			});
+		}
 	};
 
 	RECAM.Services = services;
