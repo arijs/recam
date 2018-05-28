@@ -47,6 +47,7 @@ class ConfigProvider
                 Handler\LoginHandler::class => Handler\LoginHandlerFactory::class,
                 Handler\LogoutHandler::class => Handler\LogoutHandlerFactory::class,
                 Handler\UsuarioCadastrarHandler::class => Handler\UsuarioCadastrarHandlerFactory::class,
+                Handler\WeeklyMeetings::class => Handler\WeeklyMeetingsFactory::class,
                 Handler\MailHandler::class => Handler\MailHandlerFactory::class,
                 Model\UsuarioTable::class => Model\ModelTableFactory::class,
                 Model\UsuarioAcessoTable::class => Model\ModelTableFactory::class,
