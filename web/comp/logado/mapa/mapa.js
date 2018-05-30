@@ -22,7 +22,7 @@ RECAM.comp['logado/mapa'] = {
 		},
 		renderMap: function() {
 			this.map = new google.maps.Map(this.$refs.map, {
-				zoom: 4,
+				zoom: 5,
 				center: {lat: -16, lng: -55}
 			});
 		}

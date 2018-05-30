@@ -51,6 +51,7 @@ class ConfigProvider
                 Handler\MailHandler::class => Handler\MailHandlerFactory::class,
                 Model\UsuarioTable::class => Model\ModelTableFactory::class,
                 Model\UsuarioAcessoTable::class => Model\ModelTableFactory::class,
+                Model\LocalReuniaoTable::class => Model\ModelTableFactory::class,
             ],
         ];
     }
