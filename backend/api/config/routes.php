@@ -37,6 +37,7 @@ return function (Application $app, MiddlewareFactory $factory, ContainerInterfac
     $app->get('/logout', App\Handler\LogoutHandler::class, 'logout');
     $app->post('/usuario/cadastrar', App\Handler\UsuarioCadastrarHandler::class, 'usuario.cadastrar');
     $app->get('/meeting-locations', App\Handler\WeeklyMeetings::class, 'meeting-locations');
+    $app->get('/meeting-locations-db', App\Handler\WeeklyMeetingsDb::class, 'meeting-locations-db');
     $app->get('/', App\Handler\HomePageHandler::class, 'home');
     $app->get('/api/ping', App\Handler\PingHandler::class, 'api.ping');
     $app->route('/mail', App\Handler\MailHandler::class, ['GET', 'POST'], 'mail');

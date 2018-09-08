@@ -145,17 +145,28 @@ Utils.debounce = function debounce(fn, wait) {
 		_iv && clearTimeout(_iv);
 		_iv = null;
 	}
+	function fire() {
+		waiting = false;
+		fn();
+	}
 	function trigger() {
 		cancel();
-		_iv = setTimeout(fn, wait);
+		waiting = true;
+		_iv = setTimeout(fire, wait);
 	}
 	function customWait(wait) {
 		cancel();
+		waiting = true;
 		_iv = setTimeout(fn, wait);
 	}
+	function isWaiting() {
+		return waiting;
+	}
 	var _iv;
+	var waiting = false;
 	trigger.cancel = cancel;
 	trigger.customWait = customWait;
+	trigger.isWaiting = isWaiting;
 	return trigger;
 };
 
@@ -328,7 +339,16 @@ Utils.loadAjax = function loadAjax(opt) {
 		if (req.status < 200 || req.status >= 300) {
 			err = new AjaxError('HTTP '+req.status+' '+req.statusText, req);
 		}
-		opt.cb(err, req.responseText, req);
+		var data = req.responseText;
+		var cType = req.getResponseHeader("Content-Type");
+		if (/\bapplication\/json\b/i.test(cType)) {
+			try {
+				data = JSON.parse(data);
+			} catch (e) {
+				err = new AjaxError('Invalid JSON', req, e);
+			}
+		}
+		opt.cb(err, data, req);
 	});
 	req.addEventListener('error', function(err) {
 		opt.cb(new AjaxError('Erro de rede', req, err), null, req);
@@ -349,7 +369,7 @@ Utils.loadService = function(opt) {
 	if ( reqError ) {
 		return callback(false, reqError);
 	}
-	Utils.loadAjax(opt.envPrepare(req, function(err, data) {
+	Utils.loadAjax(opt.envPrepare(req, function(err, data, req) {
 		var serviceError = null;
 		var dataError = null;
 		var isJson = false;
@@ -359,19 +379,8 @@ Utils.loadService = function(opt) {
 				error: err
 			};
 		}
-		try {
-			data = JSON.parse(data);
-			isJson = true;
-		} catch (e) {
-			if (!serviceError) {
-				serviceError = {
-					message: 'Resposta inválida do serviço',
-					error: e
-				};
-			}
-		}
-		if (isJson) {
-			dataError = opt.dataValidate(data);
+		if (!serviceError) {
+			dataError = opt.dataValidate(data, req);
 		}
 		return callback(false, dataError || serviceError, data);
 	}));

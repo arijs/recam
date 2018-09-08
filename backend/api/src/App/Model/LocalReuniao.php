@@ -44,13 +44,13 @@ class LocalReuniao
         $this->json = !empty($data['json']) ? $data['json'] : null;
 
         $inserido = !empty($data['inserido']) ? $data['inserido'] : null;
-        $this->inserido = $this->checkDate($inserido);
+        $this->inserido = self::checkDate($inserido);
 
         $atualizado = !empty($data['atualizado']) ? $data['atualizado'] : null;
-        $this->atualizado = $this->checkDate($atualizado);
+        $this->atualizado = self::checkDate($atualizado);
     }
 
-    public function checkDate($dt) {
+    public static function checkDate($dt) {
         $date = !empty($dt) ? date_parse($dt) : null;
         if (empty($date) || empty($date['year'])) {
             $date = null;

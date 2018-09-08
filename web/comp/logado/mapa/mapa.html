@@ -1,3 +1,24 @@
 <div class="recam--logado--mapa">
-	<div ref="map" v-bind:style="{height: '100vh'}"></div>
+	<div ref="map" v-bind:style="{height: '75vh'}"></div>
+	<div class="lm-actions">
+		<div class="container">
+			<p>
+				<a href="javascript:;"
+					v-on:click="loadLocationsDB"
+					v-bind:class="{'lma-disabled': loadingDB}"
+				>{{ loadingDB ? 'Carregando do banco...' : 'Forçar carregada do banco' }}</a>
+				<a href="javascript:;"
+					v-on:click="loadLocationsJW"
+					v-bind:class="{'lma-disabled': loadingJW}"
+				>{{ loadingJW ? 'Carregando do site JW.org...' : 'Forçar carregada do site JW.org' }}</a>
+			</p>
+		</div>
+	</div>
+	<div class="lm-stats">
+		<pre>{{ printStats }}</pre>
+	</div>
+	<div v-if="selectedMeeting" class="lm-selected">
+		<pre v-text="JSON.stringify(selectedMeeting, null, '\t')"></pre>
+	</div>
+	<div v-else class="lm-selected empty"></div>
 </div>

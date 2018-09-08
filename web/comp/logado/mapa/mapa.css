@@ -1,0 +1,22 @@
+.recam--logado--mapa pre {
+	margin: 0;
+}
+.recam--logado--mapa .lm-actions {
+	background: #ddd;
+}
+.recam--logado--mapa .lm-actions p {
+	margin: 0;
+}
+.recam--logado--mapa .lma-disabled {
+	color: #888;
+}
+.recam--logado--mapa .lm-stats {
+	height: 15vh;
+	background: #ccc;
+	overflow-y: scroll;
+}
+.recam--logado--mapa .lm-selected {
+	height: 35vh;
+	background: #eee;
+	overflow-y: scroll;
+}

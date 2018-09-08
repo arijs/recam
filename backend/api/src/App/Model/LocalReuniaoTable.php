@@ -5,6 +5,7 @@ namespace App\Model;
 use RuntimeException;
 use Zend\Db\TableGateway\TableGatewayInterface;
 use Zend\Db\Sql\Select;
+use Zend\Db\Sql\Expression;
 
 class LocalReuniaoTable
 {
@@ -27,9 +28,8 @@ class LocalReuniaoTable
         return $this->tableGateway->select();
     }
 
-    public function fetchAllArray()
+    public function rowsetToArray($rowset)
     {
-        $rowset = $this->fetchAll();
         $list = [];
         foreach ($rowset as $row) {
             $list[] = $row;
@@ -37,11 +37,42 @@ class LocalReuniaoTable
         return $list;
     }
 
+    public function fetchAllArray()
+    {
+        return $this->rowsetToArray($this->fetchAll());
+    }
+
     public function fetchOffsetLimit($offset, $limit)
     {
         return $this->tableGateway->select(function (Select $select) use ($offset, $limit) {
             $select->offset($offset)->limit($limit);
         });
+    }
+
+    public function select()
+    {
+        return $this->tableGateway->getSql()->select();
+    }
+
+    public function execute($sqlObject)
+    {
+        $statement = $this->tableGateway->getSql()->prepareStatementForSqlObject($sqlObject);
+        return $statement->execute();
+    }
+
+    public function searchBounds($bounds, $limit = 50)
+    {
+        $select = $this->select();
+        $select->where
+            ->greaterThanOrEqualTo('latitude', $bounds['lowerLatitude'])
+            ->greaterThanOrEqualTo('longitude', $bounds['lowerLongitude'])
+            ->lessThanOrEqualTo('latitude', $bounds['upperLatitude'])
+            ->lessThanOrEqualTo('longitude', $bounds['upperLongitude']);
+        if (!empty($limit)) {
+            $select->order(new Expression('RAND()'));
+            $select->limit($limit);
+        }
+        return $this->execute($select);
     }
 
     public function countAll()
@@ -102,7 +133,7 @@ class LocalReuniaoTable
     public function insertLocalReuniao(LocalReuniao $reuniao)
     {
         $reuniao->inserido = $reuniao->checkDate(date('Y-m-d H:i:s'));
-        $reuniao->atualizado = ['original' => 0];
+        $reuniao->atualizado = null;
         $this->tableGateway->insert($reuniao->toArray());
         $reuniao->reuniao_id = $this->tableGateway->getLastInsertValue();
     }

@@ -50,7 +50,8 @@ class WeeklyMeetings implements RequestHandlerInterface
         if($result !== false) {
             $array = json_decode($result, true);
             if(!empty($array) && !empty($array['geoLocationList'])) {
-                $this->processList($array['geoLocationList']);
+                $plist = $this->processList($array['geoLocationList']);
+                $array['geoLocationList'] = $plist;
             }
         }
 
@@ -67,10 +68,13 @@ class WeeklyMeetings implements RequestHandlerInterface
             $resultType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
             $resultStatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             $response = new TextResponse(
-                $result,
+                // $result,
+                json_encode($array),
                 $resultStatus ? $resultStatus : 200,
-                ['Content-Type' => [$typeJson]]
-                // 'X-Original-Content-Type' => [$resultType],
+                [
+                    'Content-Type' => [$typeJson],
+                    'X-Original-Content-Type' => [$resultType],
+                ]
             );
         }
 
@@ -79,11 +83,15 @@ class WeeklyMeetings implements RequestHandlerInterface
         return $response;
     }
 
-    public function processList(array $list) : void {
-        foreach ($list as $item) $this->processItem($item);
+    public function processList(array &$list) : array {
+        $plist = [];
+        foreach ($list as $item) {
+            $plist[] = $this->processItem($item);
+        }
+        return $plist;
     }
 
-    public function processItem(array $item) : void {
+    public function processItem(array &$item) : array {
         $prop = !empty($item['properties']) ? $item['properties'] : [];
         $location = !empty($item['location']) ? $item['location'] : [];
         $schedule = !empty($prop['schedule']) ? $prop['schedule'] : [];
@@ -92,14 +100,23 @@ class WeeklyMeetings implements RequestHandlerInterface
         $midweek = !empty($scurrent['midweek']) ? $scurrent['midweek'] : [];
         $localReuniao = $this->lrtable->getReuniaoByGeoId($item['geoId']);
         if (empty($localReuniao)) {
-          $localReuniao = $this->lrtable->getReuniaoByOrgId($prop['orgGuid']);
+            $localReuniao = $this->lrtable->getReuniaoByOrgId($prop['orgGuid']);
         }
         if (empty($localReuniao)) {
-          $localReuniao = new LocalReuniao();
+            $localReuniao = new LocalReuniao();
         }
+        $lrInserido = $localReuniao->inserido;
         $lrAtualizado = $localReuniao->atualizado;
         if (!empty($lrAtualizado['dt'])) {
-            if ($lrAtualizado['dt'] > $this->freshDate) return;
+            if ($lrAtualizado['dt'] > $this->freshDate) {
+                $item['-rdc-meta'] = [
+                    'action' => null,
+                    'id' => $localReuniao->reuniao_id,
+                    'inserido' => empty($lrInserido['original']) ? null : $lrInserido['original'],
+                    'atualizado' => empty($lrAtualizado['original']) ? null : $lrAtualizado['original'],
+                ];
+                return $item;
+            }
         }
         $localReuniao->geo_id = $item['geoId'];
         $localReuniao->org_id = $prop['orgGuid'];
@@ -115,7 +132,17 @@ class WeeklyMeetings implements RequestHandlerInterface
         $localReuniao->fim_semana_horario = $weekend['time'];
         $localReuniao->type = $item['type'];
         $localReuniao->json = json_encode($item);
+        $action = empty($localReuniao->reuniao_id) ? 'insert' : 'update';
         $this->lrtable->saveLocalReuniao($localReuniao);
+        $lrInserido = $localReuniao->inserido;
+        $lrAtualizado = $localReuniao->atualizado;
+        $item['-rdc-meta'] = [
+            'action' => $action,
+            'id' => $localReuniao->reuniao_id,
+            'inserido' => empty($lrInserido['original']) ? null : $lrInserido['original'],
+            'atualizado' => empty($lrAtualizado['original']) ? null : $lrAtualizado['original'],
+        ];
+        return $item;
         // {"geoId":"13B6C036-CC4B-4D94-8689-126372827D22"
         // ,"type":"weekly"
         // ,"isPrimary":true

@@ -10,9 +10,9 @@ use \App\Model\LocalReuniaoTable;
 
 class WeeklyMeetingsFactory
 {
-    public function __invoke(ContainerInterface $container) : WeeklyMeetings
+    public function __invoke(ContainerInterface $container, $handlerClass, array $options = null)
     {
-        return new WeeklyMeetings(
+        return new $handlerClass(
             $container->get(TemplateRendererInterface::class),
             $container->get(LocalReuniaoTable::class)
         );
