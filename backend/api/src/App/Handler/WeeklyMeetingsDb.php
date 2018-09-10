@@ -90,7 +90,7 @@ class WeeklyMeetingsDb implements RequestHandlerInterface
             );
             return $response;
         }
-        $limit = isset($query['nolimit']) ? 0 : 50;
+        $limit = isset($query['nolimit']) ? 0 : 250;
         $locais = $this->lrtable->searchBounds($vb['values'], $limit);
         $locaisJson = [];
         foreach ($locais as $lr) {
