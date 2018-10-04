@@ -12,6 +12,7 @@ use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\Response\RedirectResponse;
 use Zend\Expressive\Template\TemplateRendererInterface;
 use Zend\Authentication\AuthenticationService;
+use Zend\Session\Container;
 use \App\MyAuthAdapter;
 use \App\Model\Usuario;
 use \App\Model\UsuarioTable;
@@ -43,14 +44,64 @@ class LoginHandler implements RequestHandlerInterface
         if ($request->getMethod() === 'POST') {
             return $this->authenticate($request);
         }
-        return new JsonResponse([
-            'baseUrl' => $request->getAttribute(\App\Middleware\InjectBaseUrlMiddleware::class),
-            'session' => $request->getAttribute(\App\Middleware\InjectAuthMiddleware::class),
-        ]);
+        $baseUrl = $request->getAttribute(\App\Middleware\InjectBaseUrlMiddleware::class);
+        $session = $request->getAttribute(\App\Middleware\InjectAuthMiddleware::class);
+        $response = [
+            'baseUrl' => $baseUrl,
+            'session' => $session,
+        ];
+        $query = $request->getQueryParams();
+        $returnUrl = (isset($query['return']) ? $query['return'] : 'http://'.$_SERVER['HTTP_HOST'].'/api/login').'?authreturn=facebook';
+        if (isset($query['auth'])) {
+            $login = $query['auth'];
+            if ($login === 'facebook') {
+                $app = $this->authAdapter->initFacebook($returnUrl);
+                $response['facebook'] = $app['auth_url'];
+                $sessionContainer = new Container();
+                $sessionContainer->authFacebookState = $app['state'];
+            }
+        } else if (isset($query['authreturn'])) {
+            $login = $query['authreturn'];
+            if ($login === 'facebook') {
+                $sessionContainer = new Container();
+                if (empty($query['code'])) {
+                    $response['error'] = 'Parâmetro "code" não encontrado';
+                } else if (empty($query['state'])) {
+                    $response['error'] = 'Parâmetro "state" não encontrado';
+                } else if (empty($sessionContainer->authFacebookState)) {
+                    $response['error'] = 'Parâmetro "state" não encontrado na sessão';
+                } else if ($query['state'] !== $sessionContainer->authFacebookState) {
+                    $response['error'] = 'Parâmetro "state" diferente que o armazenado';
+                } else {
+                    try {
+                        $provider = $this->authAdapter->getFacebookProvider($returnUrl);
+                        $shortToken = $provider->getAccessToken('authorization_code', [
+                            'code' => $query['code']
+                        ]);
+                        $longToken = $provider->getLongLivedAccessToken($shortToken);
+                        $user = $provider->getResourceOwner($shortToken);
+                        if ($this->auth->hasIdentity()) {
+                            $this->authAdapter->setCurrentIdentity($this->auth->getIdentity());
+                        }
+                        $this->authAdapter->setFacebook([
+                            'shortToken' => $shortToken->getToken(),
+                            'longToken' => $longToken->getToken(),
+                            'user' => $user->toArray(),
+                        ]);
+                        $result = $this->auth->authenticate();
+                        return new RedirectResponse('/');
+                    } catch (Exception $e) {
+                        $response['error'] = 'Erro ao pegar os dados do usuário';
+                        $response['exception'] = $e->getMessage();
+                    }
+                }
+            }
+        }
+        return new JsonResponse($response);
 
-        return new HtmlResponse($this->template->render('app::login', [
-            'baseUrl' => $request->getAttribute(\App\Middleware\InjectBaseUrlMiddleware::class)
-        ]));
+        // return new HtmlResponse($this->template->render('app::login', [
+        //     'baseUrl' => $request->getAttribute(\App\Middleware\InjectBaseUrlMiddleware::class)
+        // ]));
     }
 
     public function authenticate(ServerRequestInterface $request)
@@ -62,27 +113,20 @@ class LoginHandler implements RequestHandlerInterface
         $error_password = [];
 
         if (empty($username)) {
-            // return new HtmlResponse($this->template->render('app::login', [
-            //     'baseUrl' => $baseUrl,
-            //     'error' => 'O login não pode estar vazio',
-            // ]))
             $error_username[] = 'O login não pode estar vazio';
         }
 
         if (empty($password)) {
-            // return new HtmlResponse($this->template->render('app::login', [
-            //     'baseUrl' => $baseUrl,
-            //     'username' => $username,
-            //     'error'    => 'A senha não pode estar vazia',
-            // ]));
             $error_password[] = 'A senha não pode estar vazia';
         }
 
         $session = null;
         $tried = false;
         if (empty($error_username) && empty($error_password)) {
-            $this->authAdapter->setUsername($username);
-            $this->authAdapter->setPassword($password);
+            $this->authAdapter->setAccount(array(
+                'username' => $username,
+                'password' => $password,
+            ));
 
             $result = $this->auth->authenticate();
             $tried = true;
@@ -115,4 +159,5 @@ class LoginHandler implements RequestHandlerInterface
         }
         return new RedirectResponse($baseUrl.'/'); */
     }
+
 }

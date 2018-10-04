@@ -1,0 +1,10 @@
+<?php
+
+return [
+	'auth' => [
+		'facebook' => [
+			'app_id' => '<APP_ID>',
+			'app_secret' => '<APP_SECRET>',
+		]
+	],
+];

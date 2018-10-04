@@ -8,27 +8,39 @@ use Zend\Authentication\Result;
 
 class MyAuthAdapter implements AdapterInterface
 {
-    private $password;
-    private $username;
+    private $account;
+    private $currentIdentity;
+    private $facebook;
     private $usuarioTable;
     private $usuarioAcessoTable;
+    private $config;
 
     public function __construct(
         Model\UsuarioTable $usuarioTable,
-        Model\UsuarioAcessoTable $usuarioAcessoTable
+        Model\UsuarioAcessoTable $usuarioAcessoTable,
+        array $config
     ) {
         $this->usuarioTable = $usuarioTable;
         $this->usuarioAcessoTable = $usuarioAcessoTable;
+        $this->config = $config;
     }
 
-    public function setPassword(string $password) : void
+    public function setAccount(string $username, string $password) : void
     {
-        $this->password = $password;
+        $this->account = array(
+            'username' => $username,
+            'password' => $password,
+        );
     }
 
-    public function setUsername(string $username) : void
+    public function setCurrentIdentity($identity) : void
     {
-        $this->username = $username;
+        $this->currentIdentity = $identity;
+    }
+
+    public function setFacebook($facebook) : void
+    {
+        $this->facebook = $facebook;
     }
 
     /**
@@ -42,15 +54,25 @@ class MyAuthAdapter implements AdapterInterface
         // and store the result in $row (e.g. associative array).
         // If you do something like this, always store the passwords using the
         // PHP password_hash() function!
+        if (empty($this->currentIdentity)) {
+            $success = false;
+            $identity = [];
+        } else {
+            $success = true;
+            $identity = $this->currentIdentity;
+        }
 
-        $u = $this->username;
-        $p = $this->password;
+        if (!empty($this->account)) {
+            $identity['username'] = null;
+            $identity['usuario'] = null;
+            $identity['acesso'] = null;
+            $u = $this->account['username'];
+            $p = $this->account['password'];
 
-        $usuario = $this->usuarioTable->getUsuarioByEmail($u);
-        if (!empty($usuario)) {
-            $up = $usuario->usuario_senha;
-            $uaut = $usuario->usuario_autorizado;
-            if ($up === $p) {
+            $usuario = $this->usuarioTable->getUsuarioByEmail($u);
+            $usuarioMatch = empty($usuario) ? false : $usuario->usuario_senha === $p;
+            if ($usuarioMatch) {
+                // $uaut = $usuario->usuario_autorizado;
                 /*if (empty($uaut)) {
                     return new Result(Result::FAILURE, $u, [
                         'Sua conta ainda não foi autorizada pelo administrador!',
@@ -62,16 +84,53 @@ class MyAuthAdapter implements AdapterInterface
                 } else {
                     $acesso = $this->usuarioAcessoTable->updateAcessoDeHoje($acesso);
                 }
-                return new Result(Result::SUCCESS, [
-                    'username' => $u,
-                    'usuario' => $usuario,
-                    'acesso' => $acesso
+                $identity['username'] = $u;
+                $identity['usuario'] = $usuario;
+                $identity['acesso'] = $acesso;
+                $success = true;
+            } else {
+                return new Result(Result::FAILURE_CREDENTIAL_INVALID, $u, [
+                    'Login ou senha inválidos'
                 ]);
             }
+
         }
 
-        return new Result(Result::FAILURE_CREDENTIAL_INVALID, $u, [
-            'Login ou senha inválidos'
+        if (!empty($this->facebook)) {
+            $identity['facebook'] = $this->facebook;
+            $success = true;
+        }
+
+        if ($success) {
+            return new Result(Result::SUCCESS, $identity);
+        } else {
+            return new Result(Result::FAILURE_CREDENTIAL_INVALID, [], [
+                'Nenhuma credencial informada'
+            ]);
+        }
+    }
+
+    public function getFacebookProvider($returnUrl)
+    {
+        $config = $this->config['facebook'];
+        return new \League\OAuth2\Client\Provider\Facebook([
+            'clientId'          => $config['app_id'],
+            'clientSecret'      => $config['app_secret'],
+            'redirectUri'       => $returnUrl,
+            'graphApiVersion'   => 'v3.1',
         ]);
+    }
+
+    public function initFacebook($returnUrl)
+    {
+        $provider = $this->getFacebookProvider($returnUrl);
+        $authUrl = $provider->getAuthorizationUrl([
+            'scope' => ['email'],
+        ]);
+        return [
+            'provider' => $provider,
+            'auth_url' => $authUrl,
+            'state' => $provider->getState(),
+        ];
     }
 }
