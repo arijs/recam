@@ -11,6 +11,7 @@ use Zend\Diactoros\Response\HtmlResponse;
 use Zend\Diactoros\Response\RedirectResponse;
 use Zend\Expressive\Template\TemplateRendererInterface;
 use Zend\Authentication\AuthenticationService;
+use Zend\Session\Container;
 // use \App\MyAuthAdapter;
 
 class LogoutHandler implements RequestHandlerInterface
@@ -31,6 +32,8 @@ class LogoutHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request) : ResponseInterface
     {
+        $session = new Container();
+        $session->exchangeArray([]);
         $this->auth->clearIdentity();
 
         $baseUrl = $request->getAttribute(\App\Middleware\InjectBaseUrlMiddleware::class);

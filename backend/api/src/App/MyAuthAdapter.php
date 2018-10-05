@@ -5,12 +5,15 @@ namespace App;
 
 use Zend\Authentication\Adapter\AdapterInterface;
 use Zend\Authentication\Result;
+use Abraham\TwitterOAuth\TwitterOAuth;
 
 class MyAuthAdapter implements AdapterInterface
 {
     private $account;
     private $currentIdentity;
     private $facebook;
+    private $google;
+    private $twitter;
     private $usuarioTable;
     private $usuarioAcessoTable;
     private $config;
@@ -41,6 +44,16 @@ class MyAuthAdapter implements AdapterInterface
     public function setFacebook($facebook) : void
     {
         $this->facebook = $facebook;
+    }
+
+    public function setGoogle($google) : void
+    {
+        $this->google = $google;
+    }
+
+    public function setTwitter($twitter) : void
+    {
+        $this->twitter = $twitter;
     }
 
     /**
@@ -101,6 +114,16 @@ class MyAuthAdapter implements AdapterInterface
             $success = true;
         }
 
+        if (!empty($this->google)) {
+            $identity['google'] = $this->google;
+            $success = true;
+        }
+
+        if (!empty($this->twitter)) {
+            $identity['twitter'] = $this->twitter;
+            $success = true;
+        }
+
         if ($success) {
             return new Result(Result::SUCCESS, $identity);
         } else {
@@ -124,13 +147,56 @@ class MyAuthAdapter implements AdapterInterface
     public function initFacebook($returnUrl)
     {
         $provider = $this->getFacebookProvider($returnUrl);
-        $authUrl = $provider->getAuthorizationUrl([
-            'scope' => ['email'],
-        ]);
+        $authUrl = $provider->getAuthorizationUrl();
         return [
             'provider' => $provider,
             'auth_url' => $authUrl,
             'state' => $provider->getState(),
+        ];
+    }
+
+    public function getGoogleProvider($returnUrl)
+    {
+        $config = $this->config['google'];
+        return new \League\OAuth2\Client\Provider\Google([
+            'clientId'          => $config['app_id'],
+            'clientSecret'      => $config['app_secret'],
+            'redirectUri'       => $returnUrl,
+        ]);
+    }
+
+    public function initGoogle($returnUrl)
+    {
+        $provider = $this->getGoogleProvider($returnUrl);
+        $authUrl = $provider->getAuthorizationUrl();
+        return [
+            'provider' => $provider,
+            'auth_url' => $authUrl,
+            'state' => $provider->getState(),
+        ];
+    }
+
+    public function getTwitterProvider()
+    {
+        $config = $this->config['twitter'];
+        return new TwitterOAuth($config['app_id'], $config['app_secret'], $config['access_token'], $config['access_token_secret']);
+    }
+
+    public function initTwitter($returnUrl)
+    {
+        $provider = $this->getTwitterProvider();
+        $requestToken = $provider->oauth('oauth/request_token', [
+            'oauth_callback' => $returnUrl,
+        ]);
+        $oauthToken = $requestToken['oauth_token'];
+        $authUrl = $provider->url("oauth/authenticate", ["oauth_token" => $oauthToken]);
+        return [
+            'provider' => $provider,
+            // 'request_token' => $requestToken,
+            'auth_url' => $authUrl,
+            'oauth_token' => $oauthToken,
+            'oauth_token_secret' => $requestToken['oauth_token_secret'],
+            'oauth_callback_confirmed' => $requestToken['oauth_callback_confirmed']
         ];
     }
 }

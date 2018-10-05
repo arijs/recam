@@ -51,16 +51,9 @@ class LoginHandler implements RequestHandlerInterface
             'session' => $session,
         ];
         $query = $request->getQueryParams();
-        $returnUrl = (isset($query['return']) ? $query['return'] : 'http://'.$_SERVER['HTTP_HOST'].'/api/login').'?authreturn=facebook';
-        if (isset($query['auth'])) {
-            $login = $query['auth'];
-            if ($login === 'facebook') {
-                $app = $this->authAdapter->initFacebook($returnUrl);
-                $response['facebook'] = $app['auth_url'];
-                $sessionContainer = new Container();
-                $sessionContainer->authFacebookState = $app['state'];
-            }
-        } else if (isset($query['authreturn'])) {
+        // $returnUrl = (isset($query['return']) ? $query['return'] : 'http://lacolhost.com/api/login');
+        $returnUrl = (isset($query['return']) ? $query['return'] : 'http://'.$_SERVER['HTTP_HOST'].'/api/login');
+        if (isset($query['authreturn'])) {
             $login = $query['authreturn'];
             if ($login === 'facebook') {
                 $sessionContainer = new Container();
@@ -74,7 +67,7 @@ class LoginHandler implements RequestHandlerInterface
                     $response['error'] = 'Parâmetro "state" diferente que o armazenado';
                 } else {
                     try {
-                        $provider = $this->authAdapter->getFacebookProvider($returnUrl);
+                        $provider = $this->authAdapter->getFacebookProvider($returnUrl.'?authreturn=facebook');
                         $shortToken = $provider->getAccessToken('authorization_code', [
                             'code' => $query['code']
                         ]);
@@ -95,7 +88,105 @@ class LoginHandler implements RequestHandlerInterface
                         $response['exception'] = $e->getMessage();
                     }
                 }
+            } else if ($login === 'google') {
+                $sessionContainer = new Container();
+                if (empty($query['code'])) {
+                    $response['error'] = 'Parâmetro "code" não encontrado';
+                } else if (empty($query['state'])) {
+                    $response['error'] = 'Parâmetro "state" não encontrado';
+                } else if (empty($sessionContainer->authGoogleState)) {
+                    $response['error'] = 'Parâmetro "state" não encontrado na sessão';
+                } else if ($query['state'] !== $sessionContainer->authGoogleState) {
+                    $response['error'] = 'Parâmetro "state" diferente que o armazenado';
+                } else {
+                    try {
+                        $provider = $this->authAdapter->getGoogleProvider($returnUrl.'?authreturn=google');
+                        $shortToken = $provider->getAccessToken('authorization_code', [
+                            'code' => $query['code']
+                        ]);
+                        // $longToken = $provider->getLongLivedAccessToken($shortToken);
+                        $user = $provider->getResourceOwner($shortToken);
+                        if ($this->auth->hasIdentity()) {
+                            $this->authAdapter->setCurrentIdentity($this->auth->getIdentity());
+                        }
+                        $this->authAdapter->setGoogle([
+                            'shortToken' => $shortToken->getToken(),
+                            // 'longToken' => $longToken->getToken(),
+                            'user' => $user->toArray(),
+                        ]);
+                        $result = $this->auth->authenticate();
+                        return new RedirectResponse('/');
+                    } catch (Exception $e) {
+                        $response['error'] = 'Erro ao pegar os dados do usuário';
+                        $response['exception'] = $e->getMessage();
+                    }
+                }
+            } else if ($login === 'twitter') {
+                $sessionContainer = new Container();
+                $sessionTwitter = $sessionContainer->authTwitterState;
+                $twitterToken = isset($sessionTwitter['oauth_token'])
+                    ? $sessionTwitter['oauth_token'] : null;
+                if (empty($query['oauth_token'])) {
+                    $response['error'] = 'Parâmetro "oauth_token" não encontrado';
+                } else if (empty($query['oauth_verifier'])) {
+                    $response['error'] = 'Parâmetro "oauth_verifier" não encontrado';
+                } else if (empty($twitterToken)) {
+                    $response['error'] = 'Parâmetro "oauth_token" não encontrado na sessão';
+                } else if ($query['oauth_token'] !== $twitterToken) {
+                    $response['error'] = 'Parâmetro "oauth_token" diferente que o armazenado';
+                } else {
+                    try {
+                        $provider = $this->authAdapter->getTwitterProvider();
+                        $provider->setOauthToken($sessionTwitter['oauth_token'], $sessionTwitter['oauth_token_secret']);
+                        // $response['twitter_session'] = print_r($sessionTwitter, true);
+                        $accessToken = $provider->oauth("oauth/access_token", ["oauth_verifier" => $query['oauth_verifier']]);
+                        // $response['twitter_access_token'] = print_r($accessToken, true);
+                        $sessionContainer->authTwitterState = [
+                            'oauth_token' => $sessionTwitter['oauth_token'],
+                            'oauth_token_secret' => $sessionTwitter['oauth_token_secret'],
+                            'access_token' => $accessToken['oauth_token'],
+                            'access_token_secret' => $accessToken['oauth_token_secret'],
+                        ];
+                        // $sessionTwitter['oauth_token'] = $accessToken['oauth_token'];
+                        // $sessionTwitter['oauth_token_secret'] = $accessToken['oauth_token_secret'];
+                        // $sessionContainer->authTwitterState = $sessionTwitter; // só pra garantir
+                        $provider->setOauthToken($accessToken['oauth_token'], $accessToken['oauth_token_secret']);
+                        $user = $provider->get("account/verify_credentials", ["include_email" => true]);
+                        // $longToken = $provider->getLongLivedAccessToken($shortToken);
+                        if ($this->auth->hasIdentity()) {
+                            $this->authAdapter->setCurrentIdentity($this->auth->getIdentity());
+                        }
+                        $this->authAdapter->setTwitter([
+                            'oauth_token' => $sessionTwitter['oauth_token'],
+                            'access_token' => $accessToken['oauth_token'],
+                            // 'oauth_token_secret' => $accessToken['oauth_token_secret'],
+                            'user' => $user,
+                        ]);
+                        $result = $this->auth->authenticate();
+                        return new RedirectResponse('/');
+                    } catch (Exception $e) {
+                        $response['error'] = 'Erro ao pegar os dados do usuário';
+                        $response['exception'] = $e->getMessage();
+                    }
+                }
             }
+        } else {
+            $sessionContainer = new Container();
+
+            $facebook = $this->authAdapter->initFacebook($returnUrl.'?authreturn=facebook');
+            $response['facebook'] = $facebook['auth_url'];
+            $sessionContainer->authFacebookState = $facebook['state'];
+
+            $google = $this->authAdapter->initGoogle($returnUrl.'?authreturn=google');
+            $response['google'] = $google['auth_url'];
+            $sessionContainer->authGoogleState = $google['state'];
+
+            $twitter = $this->authAdapter->initTwitter($returnUrl.'?authreturn=twitter');
+            $response['twitter'] = $twitter['auth_url'];
+            $sessionContainer->authTwitterState = [
+                'oauth_token' => $twitter['oauth_token'],
+                'oauth_token_secret' => $twitter['oauth_token_secret'],
+            ];
         }
         return new JsonResponse($response);
 

@@ -95,7 +95,7 @@
         "cs-check": "phpcs",
         "cs-fix": "phpcbf",
         "serve": "php -S 0.0.0.0:8080 -t public/",
-        "serve-web": "php -S 0.0.0.0:8181 -t ../../web/",
+        "serve-web": "php -S 0.0.0.0:80 -t ../../web/",
         "test": "phpunit --colors=always",
         "test-coverage": "phpunit --colors=always --coverage-clover clover.xml"
     }
