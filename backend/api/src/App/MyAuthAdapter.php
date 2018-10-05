@@ -14,6 +14,7 @@ class MyAuthAdapter implements AdapterInterface
     private $facebook;
     private $google;
     private $twitter;
+    private $linkedin;
     private $usuarioTable;
     private $usuarioAcessoTable;
     private $config;
@@ -54,6 +55,11 @@ class MyAuthAdapter implements AdapterInterface
     public function setTwitter($twitter) : void
     {
         $this->twitter = $twitter;
+    }
+
+    public function setLinkedin($linkedin) : void
+    {
+        $this->linkedin = $linkedin;
     }
 
     /**
@@ -121,6 +127,11 @@ class MyAuthAdapter implements AdapterInterface
 
         if (!empty($this->twitter)) {
             $identity['twitter'] = $this->twitter;
+            $success = true;
+        }
+
+        if (!empty($this->linkedin)) {
+            $identity['linkedin'] = $this->linkedin;
             $success = true;
         }
 
@@ -199,4 +210,26 @@ class MyAuthAdapter implements AdapterInterface
             'oauth_callback_confirmed' => $requestToken['oauth_callback_confirmed']
         ];
     }
+
+    public function getLinkedinProvider($returnUrl)
+    {
+        $config = $this->config['linkedin'];
+        return new \League\OAuth2\Client\Provider\LinkedIn([
+            'clientId'          => $config['app_id'],
+            'clientSecret'      => $config['app_secret'],
+            'redirectUri'       => $returnUrl,
+        ]);
+    }
+
+    public function initLinkedin($returnUrl)
+    {
+        $provider = $this->getLinkedinProvider($returnUrl);
+        $authUrl = $provider->getAuthorizationUrl();
+        return [
+            'provider' => $provider,
+            'auth_url' => $authUrl,
+            'state' => $provider->getState(),
+        ];
+    }
+
 }

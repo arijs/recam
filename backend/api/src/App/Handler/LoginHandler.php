@@ -169,6 +169,39 @@ class LoginHandler implements RequestHandlerInterface
                         $response['exception'] = $e->getMessage();
                     }
                 }
+            } else if ($login === 'linkedin') {
+                $sessionContainer = new Container();
+                if (empty($query['code'])) {
+                    $response['error'] = 'Parâmetro "code" não encontrado';
+                } else if (empty($query['state'])) {
+                    $response['error'] = 'Parâmetro "state" não encontrado';
+                } else if (empty($sessionContainer->authLinkedinState)) {
+                    $response['error'] = 'Parâmetro "state" não encontrado na sessão';
+                } else if ($query['state'] !== $sessionContainer->authLinkedinState) {
+                    $response['error'] = 'Parâmetro "state" diferente que o armazenado';
+                } else {
+                    try {
+                        $provider = $this->authAdapter->getLinkedinProvider($returnUrl.'?authreturn=linkedin');
+                        $shortToken = $provider->getAccessToken('authorization_code', [
+                            'code' => $query['code']
+                        ]);
+                        // $longToken = $provider->getLongLivedAccessToken($shortToken);
+                        $user = $provider->getResourceOwner($shortToken);
+                        if ($this->auth->hasIdentity()) {
+                            $this->authAdapter->setCurrentIdentity($this->auth->getIdentity());
+                        }
+                        $this->authAdapter->setLinkedin([
+                            'shortToken' => $shortToken->getToken(),
+                            // 'longToken' => $longToken->getToken(),
+                            'user' => $user->toArray(),
+                        ]);
+                        $result = $this->auth->authenticate();
+                        return new RedirectResponse('/');
+                    } catch (Exception $e) {
+                        $response['error'] = 'Erro ao pegar os dados do usuário';
+                        $response['exception'] = $e->getMessage();
+                    }
+                }
             }
         } else {
             $sessionContainer = new Container();
@@ -187,6 +220,10 @@ class LoginHandler implements RequestHandlerInterface
                 'oauth_token' => $twitter['oauth_token'],
                 'oauth_token_secret' => $twitter['oauth_token_secret'],
             ];
+
+            $linkedin = $this->authAdapter->initLinkedin($returnUrl.'?authreturn=linkedin');
+            $response['linkedin'] = $linkedin['auth_url'];
+            $sessionContainer->authLinkedinState = $linkedin['state'];
         }
         return new JsonResponse($response);
 

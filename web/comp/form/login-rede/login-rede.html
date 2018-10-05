@@ -1,0 +1,47 @@
+<div class="recam--form--login-rede">
+
+	<div class="form-group row" v-if="facebook">
+		<div class="col-md-12">
+			<a v-bind:href="facebook" class="btn btn-primary btn-lg btn-block">Fazer login com Facebook</a>
+		</div>
+	</div>
+	<!-- <div class="form-group row" v-else>
+		<div class="col-md-12">
+			<button type="button" class="btn btn-primary btn-lg btn-block" disabled>Carregando Facebook...</button>
+		</div>
+	</div> -->
+
+	<div class="form-group row" v-if="google">
+		<div class="col-md-12">
+			<a v-bind:href="google" class="btn btn-light btn-lg btn-block">Fazer login com Google</a>
+		</div>
+	</div>
+	<!-- <div class="form-group row" v-else>
+		<div class="col-md-12">
+			<button type="button" class="btn btn-light btn-lg btn-block" disabled>Carregando Google...</button>
+		</div>
+	</div> -->
+
+	<div class="form-group row" v-if="twitter">
+		<div class="col-md-12">
+			<a v-bind:href="twitter" class="btn btn-secondary btn-lg btn-block">Fazer login com Twitter</a>
+		</div>
+	</div>
+	<!-- <div class="form-group row" v-else>
+		<div class="col-md-12">
+			<button type="button" class="btn btn-secondary btn-lg btn-block" disabled>Carregando Twitter...</button>
+		</div>
+	</div> -->
+
+	<div class="form-group row" v-if="linkedin">
+		<div class="col-md-12">
+			<a v-bind:href="linkedin" class="btn btn-info btn-lg btn-block">Fazer login com LinkedIn</a>
+		</div>
+	</div>
+	<!-- <div class="form-group row" v-else>
+		<div class="col-md-12">
+			<button type="button" class="btn btn-secondary btn-lg btn-block" disabled>Carregando Linkedin...</button>
+		</div>
+	</div> -->
+
+</div>
