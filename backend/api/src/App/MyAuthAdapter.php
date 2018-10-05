@@ -15,6 +15,8 @@ class MyAuthAdapter implements AdapterInterface
     private $google;
     private $twitter;
     private $linkedin;
+    private $github;
+    private $paypal;
     private $usuarioTable;
     private $usuarioAcessoTable;
     private $config;
@@ -60,6 +62,16 @@ class MyAuthAdapter implements AdapterInterface
     public function setLinkedin($linkedin) : void
     {
         $this->linkedin = $linkedin;
+    }
+
+    public function setGithub($github) : void
+    {
+        $this->github = $github;
+    }
+
+    public function setPaypal($paypal) : void
+    {
+        $this->paypal = $paypal;
     }
 
     /**
@@ -134,6 +146,16 @@ class MyAuthAdapter implements AdapterInterface
             $identity['linkedin'] = $this->linkedin;
             $success = true;
         }
+
+        // if (!empty($this->github)) {
+        //     $identity['github'] = $this->github;
+        //     $success = true;
+        // }
+        
+        // if (!empty($this->paypal)) {
+        //     $identity['paypal'] = $this->paypal;
+        //     $success = true;
+        // }
 
         if ($success) {
             return new Result(Result::SUCCESS, $identity);
@@ -225,6 +247,53 @@ class MyAuthAdapter implements AdapterInterface
     {
         $provider = $this->getLinkedinProvider($returnUrl);
         $authUrl = $provider->getAuthorizationUrl();
+        return [
+            'provider' => $provider,
+            'auth_url' => $authUrl,
+            'state' => $provider->getState(),
+        ];
+    }
+
+    public function getGithubProvider($returnUrl)
+    {
+        $config = $this->config['github'];
+        return new \League\OAuth2\Client\Provider\Github([
+            'clientId'          => $config['app_id'],
+            'clientSecret'      => $config['app_secret'],
+            'redirectUri'       => $returnUrl,
+        ]);
+    }
+
+    public function initGithub($returnUrl)
+    {
+        $provider = $this->getGithubProvider($returnUrl);
+        $authUrl = $provider->getAuthorizationUrl([
+            'scope' => ['user','user:email','repo'] // array or string
+        ]);
+        return [
+            'provider' => $provider,
+            'auth_url' => $authUrl,
+            'state' => $provider->getState(),
+        ];
+    }
+
+    public function getPaypalProvider($returnUrl)
+    {
+        $config = $this->config['paypal'];
+        return new \Stevenmaguire\OAuth2\Client\Provider\Paypal([
+            'clientId'          => $config['app_id'],
+            'clientSecret'      => $config['app_secret'],
+            'redirectUri'       => $returnUrl,
+            'isSandbox'         => true,
+        ]);
+    }
+
+    public function initPaypal($returnUrl)
+    {
+        $provider = $this->getPaypalProvider($returnUrl);
+        $authUrl = $provider->getAuthorizationUrl([
+            'scope' => ['profile', 'email', 'address']
+        ]);
         return [
             'provider' => $provider,
             'auth_url' => $authUrl,

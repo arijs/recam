@@ -224,6 +224,14 @@ class LoginHandler implements RequestHandlerInterface
             $linkedin = $this->authAdapter->initLinkedin($returnUrl.'?authreturn=linkedin');
             $response['linkedin'] = $linkedin['auth_url'];
             $sessionContainer->authLinkedinState = $linkedin['state'];
+
+            // $github = $this->authAdapter->initGithub($returnUrl.'?authreturn=github');
+            // $response['github'] = $github['auth_url'];
+            // $sessionContainer->authGithubState = $github['state'];
+
+            // $paypal = $this->authAdapter->initPaypal($returnUrl.'?authreturn=paypal');
+            // $response['paypal'] = $paypal['auth_url'];
+            // $sessionContainer->authPaypalState = $paypal['state'];
         }
         return new JsonResponse($response);
 
