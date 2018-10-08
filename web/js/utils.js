@@ -905,15 +905,19 @@ var reEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 var reCep = /^[0-9]{8}$/;
 var reDateDdMmYyyy = /^([0-9]{2})\/([0-9]{2})\/([0-9]{4})$/;
 
+function trimValor(campo) {
+	return campo.valor.replace(reTrim, '');
+}
+function removeNonDigits(campo) {
+	return campo.valor.replace(rnd, '');
+}
 function naoVazio(campo) {
-	var valor = campo.valor.replace(reTrim, '');
-	if (!valor) {
+	if (!trimValor(campo)) {
 		return {falta: true};
 	}
 }
 function opcional(campo) {
-	var valor = campo.valor.replace(reTrim, '');
-	if (!valor) {
+	if (!trimValor(campo)) {
 		return {falta: false};
 	}
 }
@@ -928,44 +932,38 @@ function selecionado(campo) {
 	}
 }
 function fone(campo) {
-	var valor = campo.valor.replace(rnd, '');;
+	var valor = campo.valor.replace(rnd, '');
 	if (!reFone.test(valor)) {
 		return {erro:'Telefone inválido'};
 	}
 }
 function fone8(campo) {
-	var valor = campo.valor.replace(rnd, '');;
-	if (!reFone8.test(valor)) {
+	if (!reFone8.test(removeNonDigits(campo))) {
 		return {erro:'Telefone inválido'};
 	}
 }
 function fone9(campo) {
-	var valor = campo.valor.replace(rnd, '');;
-	if (!reFone9.test(valor)) {
+	if (!reFone9.test(removeNonDigits(campo))) {
 		return {erro:'Telefone inválido'};
 	}
 }
 function email(campo) {
-	var valor = campo.valor;
-	if (!reEmail.test(valor)) {
+	if (!reEmail.test(campo.valor)) {
 		return {erro:'Email inválido'};
 	}
 }
 function cnpj(campo) {
-	var valor = campo.valor.replace(rnd, '');
-	if ( !Utils.digitoVerificador.valida.cnpj(valor) ) {
+	if ( !Utils.digitoVerificador.valida.cnpj(removeNonDigits(campo)) ) {
 		return {erro:'CNPJ inválido'};
 	}
 }
 function cpf(campo) {
-	var valor = campo.valor.replace(rnd, '');
-	if ( !Utils.digitoVerificador.valida.cpf(valor) ) {
+	if ( !Utils.digitoVerificador.valida.cpf(removeNonDigits(campo)) ) {
 		return {erro:'CPF inválido'};
 	}
 }
 function cep(campo) {
-	var valor = campo.valor.replace(rnd, '');
-	if (!reCep.test(valor)) {
+	if (!reCep.test(removeNonDigits(campo))) {
 		return {erro:'CEP inválido'};
 	}
 }
@@ -997,6 +995,8 @@ function currentStatus(campo) {
 }
 
 return {
+	trimValor: trimValor,
+	removeNonDigits: removeNonDigits,
 	naoVazio: naoVazio,
 	opcional: opcional,
 	isTrue: isTrue,
