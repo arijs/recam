@@ -49,20 +49,35 @@ class UsuarioTwitter
     }
 
     public function toArray() {
-      $inserido = $this->inserido;
-      $atualizado = $this->atualizado;
-      $inserido   = !empty($inserido  ['original']) ? $inserido  ['original'] : 0;
-      $atualizado = !empty($atualizado['original']) ? $atualizado['original'] : 0;
-      $data = [
-          'id' => $this->id,
-          'id_twitter' => $this->id_twitter,
-          'nome'  => $this->nome,
-          'email' => $this->email,
-          'url_foto' => $this->url_foto,
-          'json'  => $this->json,
-          'inserido' => $inserido,
-          'atualizado' => $atualizado,
-      ];
-      return $data;
+        $inserido = $this->inserido;
+        $atualizado = $this->atualizado;
+        $inserido   = !empty($inserido  ['original']) ? $inserido  ['original'] : 0;
+        $atualizado = !empty($atualizado['original']) ? $atualizado['original'] : 0;
+        $data = [
+            'id' => $this->id,
+            'id_twitter' => $this->id_twitter,
+            'nome'  => $this->nome,
+            'email' => $this->email,
+            'url_foto' => $this->url_foto,
+            'json'  => $this->json,
+            'inserido' => $inserido,
+            'atualizado' => $atualizado,
+        ];
+        return $data;
+    }
+
+    public function toArrayInsert() {
+        $this->inserido = $this->checkDate(date('Y-m-d H:i:s'));
+        $this->atualizado = $this->checkDate('0000-00-00 00:00:00');
+        $data = $this->toArray();
+        $data['atualizado'] = 0;
+        return $data;
+    }
+
+    public function toArrayUpdate() {
+        $this->atualizado = $this->checkDate(date('Y-m-d H:i:s'));
+        $data = $this->toArray();
+        unset($data['inserido']);
+        return $data;
     }
 }

@@ -139,10 +139,19 @@ class LoginHandler implements RequestHandlerInterface
                         if ($this->auth->hasIdentity()) {
                             $this->authAdapter->setCurrentIdentity($this->auth->getIdentity());
                         }
+                        $usuarioGoogle = new UsuarioGoogle();
+                        $usuarioGoogle->readGoogleJson($user->toArray());
+                        $this->usuarioGoogleTable->saveUsuarioByIdGoogle($usuarioGoogle);
+                        $usuario = $this->usuarioTable->getUsuarioGoogle($usuarioGoogle);
+                        if (!empty($usuario)) {
+                            $this->authAdapter->setUsuario($usuario);
+                        }
+                        $usuarioArray = $usuarioGoogle->toArray();
+                        $usuarioArray['json'] = $user->toArray();
                         $this->authAdapter->setGoogle([
                             'shortToken' => $shortToken->getToken(),
                             // 'longToken' => $longToken->getToken(),
-                            'user' => $user->toArray(),
+                            'user' => $usuarioArray,
                         ]);
                         $result = $this->auth->authenticate();
                         return new RedirectResponse('/');
@@ -186,11 +195,20 @@ class LoginHandler implements RequestHandlerInterface
                         if ($this->auth->hasIdentity()) {
                             $this->authAdapter->setCurrentIdentity($this->auth->getIdentity());
                         }
+                        $usuarioTwitter = new UsuarioTwitter();
+                        $usuarioTwitter->readTwitterJson($user);
+                        $this->usuarioTwitterTable->saveUsuarioByIdTwitter($usuarioTwitter);
+                        $usuario = $this->usuarioTable->getUsuarioTwitter($usuarioTwitter);
+                        if (!empty($usuario)) {
+                            $this->authAdapter->setUsuario($usuario);
+                        }
+                        $usuarioArray = $usuarioTwitter->toArray();
+                        $usuarioArray['json'] = $user;
                         $this->authAdapter->setTwitter([
                             'oauth_token' => $sessionTwitter['oauth_token'],
                             'access_token' => $accessToken['oauth_token'],
                             // 'oauth_token_secret' => $accessToken['oauth_token_secret'],
-                            'user' => $user,
+                            'user' => $usuarioArray,
                         ]);
                         $result = $this->auth->authenticate();
                         return new RedirectResponse('/');
@@ -220,10 +238,19 @@ class LoginHandler implements RequestHandlerInterface
                         if ($this->auth->hasIdentity()) {
                             $this->authAdapter->setCurrentIdentity($this->auth->getIdentity());
                         }
+                        $usuarioLinkedin = new UsuarioLinkedin();
+                        $usuarioLinkedin->readLinkedinJson($user->toArray());
+                        $this->usuarioLinkedinTable->saveUsuarioByIdLinkedin($usuarioLinkedin);
+                        $usuario = $this->usuarioTable->getUsuarioLinkedin($usuarioLinkedin);
+                        if (!empty($usuario)) {
+                            $this->authAdapter->setUsuario($usuario);
+                        }
+                        $usuarioArray = $usuarioLinkedin->toArray();
+                        $usuarioArray['json'] = $user->toArray();
                         $this->authAdapter->setLinkedin([
                             'shortToken' => $shortToken->getToken(),
                             // 'longToken' => $longToken->getToken(),
-                            'user' => $user->toArray(),
+                            'user' => $usuarioArray,
                         ]);
                         $result = $this->auth->authenticate();
                         return new RedirectResponse('/');

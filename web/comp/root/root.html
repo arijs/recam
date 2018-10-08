@@ -4,5 +4,6 @@
     <p>Carregando...</p>
   </div>
   <recam--logado v-else-if="session && session.usuario"></recam--logado>
+  <recam--cadastrar-rede v-else-if="session && (session.facebook || session.google || session.twitter || session.linkedin)"></recam--cadastrar-rede/>
   <recam--nao-logado v-else></recam--nao-logado>
 </div>

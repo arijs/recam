@@ -225,7 +225,10 @@ class MyAuthAdapter implements AdapterInterface
     public function getTwitterProvider()
     {
         $config = $this->config['twitter'];
-        return new TwitterOAuth($config['app_id'], $config['app_secret'], $config['access_token'], $config['access_token_secret']);
+        $provider = new TwitterOAuth($config['app_id'], $config['app_secret'], $config['access_token'], $config['access_token_secret']);
+        $provider->setDecodeJsonAsArray(true);
+        $provider->setTimeouts(15, 20);
+        return $provider;
     }
 
     public function initTwitter($returnUrl)

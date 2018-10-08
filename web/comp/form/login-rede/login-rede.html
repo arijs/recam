@@ -1,19 +1,24 @@
 <div class="recam--form--login-rede">
 
-	<div class="card" v-if="sessionFacebook">
-		<img class="card-img-top" v-bind:src="sessionFacebook.user.picture_url" alt="Facebook picture">
-		<div class="card-body">
-			<h5 class="card-title">{{sessionFacebook.user.name}}</h5>
-			<p class="card-text">Email: {{sessionFacebook.user.email}}</p>
-			<p class="card-text">ID: {{sessionFacebook.user.id}}</p>
-			<!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
-			<div class="alert alert-primary" role="alert">
-				Facebook autenticado!
+	<div class="row" v-if="sessionFacebook">
+		<div class="col col-12 col-sm-3 pr-sm-0 pb-3">
+			<img class="img-fluid w-100" v-bind:src="sessionFacebook.user.url_foto" alt="Facebook picture" />
+		</div>
+		<div class="col pb-3">
+			<div class="alert alert-primary h-100" role="alert">
+				<h5 class="card-title">
+					<span class="badge badge-primary">Facebook</span>
+					{{sessionFacebook.user.nome}}
+				</h5>
+				<p class="card-text">Email: {{sessionFacebook.user.email}}</p>
+				<!-- <p class="card-text">ID: {{sessionFacebook.user.id_facebook}}</p> -->
+				<!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
+				<!-- Facebook autenticado! -->
 			</div>
 		</div>
 	</div>
 	<div class="form-group row" v-else-if="facebook">
-		<div class="col-md-12">
+		<div class="col col-md-12">
 			<a v-bind:href="facebook" class="btn btn-primary btn-lg btn-block">Fazer login com Facebook</a>
 		</div>
 	</div>
@@ -23,15 +28,20 @@
 		</div>
 	</div> -->
 
-	<div class="card" v-if="sessionGoogle">
-		<img class="card-img-top" v-bind:src="sessionGoogle.user.image.url" alt="Google picture">
-		<div class="card-body">
-			<h5 class="card-title">{{sessionGoogle.user.displayName}}</h5>
-			<p class="card-text">Email: {{sessionGoogle.user.emails[0].value}}</p>
-			<p class="card-text">ID: {{sessionGoogle.user.id}}</p>
-			<!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
-			<div class="alert alert-light" role="alert">
-				Google autenticado!
+	<div class="row" v-if="sessionGoogle">
+		<div class="col col-12 col-sm-3 pr-sm-0 pb-3">
+			<img class="img-fluid w-100" v-bind:src="sessionGoogle.user.url_foto" alt="Google picture" />
+		</div>
+		<div class="col pb-3">
+			<div class="alert alert-light border h-100" role="alert">
+				<h5 class="card-title">
+					<span class="badge badge-light">Google</span>
+					{{sessionGoogle.user.nome}}
+				</h5>
+				<p class="card-text">Email: {{sessionGoogle.user.email}}</p>
+				<!-- <p class="card-text">ID: {{sessionGoogle.user.id_google}}</p> -->
+				<!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
+				<!-- Google autenticado! -->
 			</div>
 		</div>
 	</div>
@@ -46,15 +56,20 @@
 		</div>
 	</div> -->
 
-	<div class="card" v-if="sessionTwitter">
-		<img class="card-img-top" v-bind:src="sessionTwitter.user.profile_image_url_https" alt="Twitter picture">
-		<div class="card-body">
-			<h5 class="card-title">{{sessionTwitter.user.name}}</h5>
-			<p class="card-text">Email: {{sessionTwitter.user.email}}</p>
-			<p class="card-text">ID: {{sessionTwitter.user.id}}</p>
-			<!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
-			<div class="alert alert-secondary" role="alert">
-				Twitter autenticado!
+	<div class="row" v-if="sessionTwitter">
+		<div class="col col-12 col-sm-3 pr-sm-0 pb-3">
+			<img class="img-fluid w-100" v-bind:src="sessionTwitter.user.url_foto" alt="Twitter picture" />
+		</div>
+		<div class="col pb-3">
+			<div class="alert alert-secondary h-100" role="alert">
+				<h5 class="card-title">
+					<span class="badge badge-secondary">Twitter</span>
+					{{sessionTwitter.user.nome}}
+				</h5>
+				<p class="card-text">Email: {{sessionTwitter.user.email}}</p>
+				<!-- <p class="card-text">ID: {{sessionTwitter.user.id_twitter}}</p> -->
+				<!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
+				<!-- Twitter autenticado! -->
 			</div>
 		</div>
 	</div>
@@ -69,15 +84,20 @@
 		</div>
 	</div> -->
 
-	<div class="card" v-if="sessionLinkedin">
-		<img class="card-img-top" v-bind:src="sessionLinkedin.user.pictureUrl" alt="Linkedin picture">
-		<div class="card-body">
-			<h5 class="card-title">{{sessionLinkedin.user.firstName}} {{sessionLinkedin.user.lastName}}</h5>
-			<p class="card-text">Email: {{sessionLinkedin.user.emailAddress}}</p>
-			<p class="card-text">ID: {{sessionLinkedin.user.id}}</p>
-			<!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
-			<div class="alert alert-info" role="alert">
-				LinkedIn autenticado!
+	<div class="row" v-if="sessionLinkedin">
+		<div class="col col-12 col-sm-3 pr-sm-0 pb-3">
+			<img class="img-fluid w-100" v-bind:src="sessionLinkedin.user.url_foto" alt="Linkedin picture" />
+		</div>
+		<div class="col pb-3">
+			<div class="alert alert-info h-100" role="alert">
+				<h5 class="card-title">
+					<span class="badge badge-info">Linkedin</span>
+					{{sessionLinkedin.user.nome}}
+				</h5>
+				<p class="card-text">Email: {{sessionLinkedin.user.email}}</p>
+				<!-- <p class="card-text">ID: {{sessionLinkedin.user.id_linkedin}}</p> -->
+				<!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
+				<!-- LinkedIn autenticado! -->
 			</div>
 		</div>
 	</div>
