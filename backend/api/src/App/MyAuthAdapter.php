@@ -36,6 +36,16 @@ class MyAuthAdapter implements AdapterInterface
         $this->account = array(
             'username' => $username,
             'password' => $password,
+            'usuario'  => null
+        );
+    }
+
+    public function setUsuario(Model\Usuario $usuario) : void
+    {
+        $this->account = array(
+            'username' => $usuario->usuario_email,
+            'password' => $usuario->usuario_senha,
+            'usuario'  => $usuario,
         );
     }
 
@@ -99,8 +109,11 @@ class MyAuthAdapter implements AdapterInterface
             $identity['acesso'] = null;
             $u = $this->account['username'];
             $p = $this->account['password'];
+            $usuario = $this->account['usuario'];
 
-            $usuario = $this->usuarioTable->getUsuarioByEmail($u);
+            if (empty($usuario)) {
+                $usuario = $this->usuarioTable->getUsuarioByEmail($u);
+            }
             $usuarioMatch = empty($usuario) ? false : $usuario->usuario_senha === $p;
             if ($usuarioMatch) {
                 // $uaut = $usuario->usuario_autorizado;
@@ -151,7 +164,7 @@ class MyAuthAdapter implements AdapterInterface
         //     $identity['github'] = $this->github;
         //     $success = true;
         // }
-        
+
         // if (!empty($this->paypal)) {
         //     $identity['paypal'] = $this->paypal;
         //     $success = true;

@@ -10,6 +10,9 @@ RECAM.comp['form/login'] = {
 		erro: function() {
 			return this.$store.state.formLoginErro;
 		},
+		erroTipo: function() {
+			return this.$store.state.formLoginErroTipo;
+		},
 		postLoginLoading: function() {
 			return this.$store.state.servicePostLoginLoading;
 		}
@@ -53,6 +56,18 @@ RECAM.comp['form/login'] = {
 							context.commit('setFormLoginErro', errorList.join(' / '));
 						}
 					});
+				}
+			});
+		},
+		clickEsqueci: function() {
+			var context = this.$store;
+			var formLogin = {
+				login: this.campos.login
+			};
+			context.dispatch('validarForm', formLogin).then(function(result) {
+				var erro = result.erroMensagem;
+				context.commit('setFormLoginErro', erro);
+				if (!erro) {
 				}
 			});
 		},

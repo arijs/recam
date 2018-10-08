@@ -52,6 +52,10 @@ class ConfigProvider
                 Handler\MailHandler::class => Handler\MailHandlerFactory::class,
                 Model\UsuarioTable::class => Model\ModelTableFactory::class,
                 Model\UsuarioAcessoTable::class => Model\ModelTableFactory::class,
+                Model\UsuarioFacebookTable::class => Model\ModelTableFactory::class,
+                Model\UsuarioGoogleTable::class => Model\ModelTableFactory::class,
+                Model\UsuarioTwitterTable::class => Model\ModelTableFactory::class,
+                Model\UsuarioLinkedinTable::class => Model\ModelTableFactory::class,
                 Model\LocalReuniaoTable::class => Model\ModelTableFactory::class,
             ],
         ];

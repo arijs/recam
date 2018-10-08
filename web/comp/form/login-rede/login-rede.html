@@ -1,6 +1,18 @@
 <div class="recam--form--login-rede">
 
-	<div class="form-group row" v-if="facebook">
+	<div class="card" v-if="sessionFacebook">
+		<img class="card-img-top" v-bind:src="sessionFacebook.user.picture_url" alt="Facebook picture">
+		<div class="card-body">
+			<h5 class="card-title">{{sessionFacebook.user.name}}</h5>
+			<p class="card-text">Email: {{sessionFacebook.user.email}}</p>
+			<p class="card-text">ID: {{sessionFacebook.user.id}}</p>
+			<!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
+			<div class="alert alert-primary" role="alert">
+				Facebook autenticado!
+			</div>
+		</div>
+	</div>
+	<div class="form-group row" v-else-if="facebook">
 		<div class="col-md-12">
 			<a v-bind:href="facebook" class="btn btn-primary btn-lg btn-block">Fazer login com Facebook</a>
 		</div>
@@ -11,7 +23,19 @@
 		</div>
 	</div> -->
 
-	<div class="form-group row" v-if="google">
+	<div class="card" v-if="sessionGoogle">
+		<img class="card-img-top" v-bind:src="sessionGoogle.user.image.url" alt="Google picture">
+		<div class="card-body">
+			<h5 class="card-title">{{sessionGoogle.user.displayName}}</h5>
+			<p class="card-text">Email: {{sessionGoogle.user.emails[0].value}}</p>
+			<p class="card-text">ID: {{sessionGoogle.user.id}}</p>
+			<!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
+			<div class="alert alert-light" role="alert">
+				Google autenticado!
+			</div>
+		</div>
+	</div>
+	<div class="form-group row" v-else-if="google">
 		<div class="col-md-12">
 			<a v-bind:href="google" class="btn btn-light btn-lg btn-block">Fazer login com Google</a>
 		</div>
@@ -22,7 +46,19 @@
 		</div>
 	</div> -->
 
-	<div class="form-group row" v-if="twitter">
+	<div class="card" v-if="sessionTwitter">
+		<img class="card-img-top" v-bind:src="sessionTwitter.user.profile_image_url_https" alt="Twitter picture">
+		<div class="card-body">
+			<h5 class="card-title">{{sessionTwitter.user.name}}</h5>
+			<p class="card-text">Email: {{sessionTwitter.user.email}}</p>
+			<p class="card-text">ID: {{sessionTwitter.user.id}}</p>
+			<!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
+			<div class="alert alert-secondary" role="alert">
+				Twitter autenticado!
+			</div>
+		</div>
+	</div>
+	<div class="form-group row" v-else-if="twitter">
 		<div class="col-md-12">
 			<a v-bind:href="twitter" class="btn btn-secondary btn-lg btn-block">Fazer login com Twitter</a>
 		</div>
@@ -33,7 +69,19 @@
 		</div>
 	</div> -->
 
-	<div class="form-group row" v-if="linkedin">
+	<div class="card" v-if="sessionLinkedin">
+		<img class="card-img-top" v-bind:src="sessionLinkedin.user.pictureUrl" alt="Linkedin picture">
+		<div class="card-body">
+			<h5 class="card-title">{{sessionLinkedin.user.firstName}} {{sessionLinkedin.user.lastName}}</h5>
+			<p class="card-text">Email: {{sessionLinkedin.user.emailAddress}}</p>
+			<p class="card-text">ID: {{sessionLinkedin.user.id}}</p>
+			<!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
+			<div class="alert alert-info" role="alert">
+				LinkedIn autenticado!
+			</div>
+		</div>
+	</div>
+	<div class="form-group row" v-else-if="linkedin">
 		<div class="col-md-12">
 			<a v-bind:href="linkedin" class="btn btn-info btn-lg btn-block">Fazer login com LinkedIn</a>
 		</div>

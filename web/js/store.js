@@ -41,6 +41,7 @@ var state = {
 		}
 	},
 	formLoginErro: null,
+	formLoginErroTipo: null,
 	formUsuarioCadastrar: {
 		nome: {
 			nome: 'nome',
@@ -339,6 +340,9 @@ var mutations = {
 	},
 	setFormLoginErro: function(state, erro) {
 		state.formLoginErro = erro;
+	},
+	setFormLoginErroTipo: function(state, tipo) {
+		state.formLoginErroTipo = tipo;
 	},
 	setFormUsuarioCadastrarErro: function(state, erro) {
 		state.formUsuarioCadastrarErro = erro;

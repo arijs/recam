@@ -16,6 +16,14 @@ use Zend\Session\Container;
 use \App\MyAuthAdapter;
 use \App\Model\Usuario;
 use \App\Model\UsuarioTable;
+use \App\Model\UsuarioFacebook;
+use \App\Model\UsuarioFacebookTable;
+use \App\Model\UsuarioGoogle;
+use \App\Model\UsuarioGoogleTable;
+use \App\Model\UsuarioTwitter;
+use \App\Model\UsuarioTwitterTable;
+use \App\Model\UsuarioLinkedin;
+use \App\Model\UsuarioLinkedinTable;
 
 class LoginHandler implements RequestHandlerInterface
 {
@@ -23,17 +31,29 @@ class LoginHandler implements RequestHandlerInterface
      private $auth;
      private $authAdapter;
      private $usuarioTable;
+     private $usuarioFacebookTable;
+     private $usuarioGoogleTable;
+     private $usuarioTwitterTable;
+     private $usuarioLinkedinTable;
 
      public function __construct(
          TemplateRendererInterface $template,
          AuthenticationService $auth,
          MyAuthAdapter $authAdapter,
-         UsuarioTable $usuarioTable
+         UsuarioTable $usuarioTable,
+         UsuarioFacebookTable $usuarioFacebookTable,
+         UsuarioGoogleTable $usuarioGoogleTable,
+         UsuarioTwitterTable $usuarioTwitterTable,
+         UsuarioLinkedinTable $usuarioLinkedinTable
      ) {
          $this->template     = $template;
          $this->auth         = $auth;
          $this->authAdapter  = $authAdapter;
          $this->usuarioTable = $usuarioTable;
+         $this->usuarioFacebookTable = $usuarioFacebookTable;
+         $this->usuarioGoogleTable   = $usuarioGoogleTable;
+         $this->usuarioTwitterTable  = $usuarioTwitterTable;
+         $this->usuarioLinkedinTable = $usuarioLinkedinTable;
      }
 
     /**
@@ -52,7 +72,7 @@ class LoginHandler implements RequestHandlerInterface
         ];
         $query = $request->getQueryParams();
         // $returnUrl = (isset($query['return']) ? $query['return'] : 'http://lacolhost.com/api/login');
-        $returnUrl = (isset($query['return']) ? $query['return'] : 'http://'.$_SERVER['HTTP_HOST'].'/api/login');
+        $returnUrl = (isset($query['return']) ? $query['return'] : 'https://'.$_SERVER['HTTP_HOST'].'/api/login');
         if (isset($query['authreturn'])) {
             $login = $query['authreturn'];
             if ($login === 'facebook') {
@@ -76,10 +96,20 @@ class LoginHandler implements RequestHandlerInterface
                         if ($this->auth->hasIdentity()) {
                             $this->authAdapter->setCurrentIdentity($this->auth->getIdentity());
                         }
+                        $usuarioFacebook = new UsuarioFacebook();
+                        $usuarioFacebook->readFacebookJson($user->toArray());
+                        $this->usuarioFacebookTable->saveUsuarioByIdFacebook($usuarioFacebook);
+                        $usuario = $this->usuarioTable->getUsuarioFacebook($usuarioFacebook);
+                        if (!empty($usuario)) {
+                            $this->authAdapter->setUsuario($usuario);
+                        }
+                        $usuarioArray = $usuarioFacebook->toArray();
+                        $usuarioArray['json'] = $user->toArray();
                         $this->authAdapter->setFacebook([
                             'shortToken' => $shortToken->getToken(),
                             'longToken' => $longToken->getToken(),
-                            'user' => $user->toArray(),
+                            // 'user' => $user->toArray(),
+                            'user' => $usuarioArray,
                         ]);
                         $result = $this->auth->authenticate();
                         return new RedirectResponse('/');
@@ -259,10 +289,7 @@ class LoginHandler implements RequestHandlerInterface
         $session = null;
         $tried = false;
         if (empty($error_username) && empty($error_password)) {
-            $this->authAdapter->setAccount(array(
-                'username' => $username,
-                'password' => $password,
-            ));
+            $this->authAdapter->setAccount($username, $password);
 
             $result = $this->auth->authenticate();
             $tried = true;
