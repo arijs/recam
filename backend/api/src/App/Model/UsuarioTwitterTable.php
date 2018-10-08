@@ -6,12 +6,12 @@ use RuntimeException;
 use Zend\Db\TableGateway\TableGatewayInterface;
 use Zend\Db\Sql\Select;
 
-class UsuarioTable
+class UsuarioTwitterTable
 {
     private $tableGateway;
 
-    public static $model = Usuario::class;
-    public static $tableName = 'usuarios';
+    public static $model = UsuarioTwitter::class;
+    public static $tableName = 'usuarios_twitter';
 
     public static function create() {
         return new self::$model();
@@ -26,7 +26,7 @@ class UsuarioTable
     {
         $map = [];
         foreach ($list as $usuario) {
-            $map[$usuario->usuario_id] = $usuario;
+            $map[$usuario->id] = $usuario;
         }
         return $map;
     }
@@ -73,7 +73,7 @@ class UsuarioTable
     public function getUsuario($id)
     {
         $id = (int) $id;
-        $rowset = $this->tableGateway->select(['usuario_id' => $id]);
+        $rowset = $this->tableGateway->select(['id' => $id]);
         $row = $rowset->current();
         if (! $row) {
             throw new RuntimeException(sprintf(
@@ -85,39 +85,27 @@ class UsuarioTable
         return $row;
     }
 
-    public function getUsuarioByEmail($email)
+    public function getUsuariosByEmail($email)
     {
-        $rowset = $this->tableGateway->select(['usuario_email' => $email]);
+        return $this->tableGateway->select(['email' => $email]);
+    }
+
+    public function getUsuarioByIdTwitter($id_twitter)
+    {
+        $rowset = $this->tableGateway->select(['id_twitter' => $id_twitter]);
         return $rowset->current();
     }
 
-    public function getUsuarioFacebook(UsuarioFacebook $usuario)
+    public function saveUsuarioByIdTwitter(UsuarioTwitter $usuario)
     {
-        $rowset = $this->tableGateway->select(['id_facebook' => $usuario->id]);
-        return $rowset->current();
+        $row = $this->getUsuarioByIdTwitter($usuario->id_twitter);
+        if (!empty($row)) $usuario->id = $row['id'];
+        $this->saveUsuario($usuario);
     }
 
-    public function getUsuarioGoogle(UsuarioGoogle $usuario)
+    public function saveUsuario(UsuarioTwitter $usuario)
     {
-        $rowset = $this->tableGateway->select(['id_google' => $usuario->id]);
-        return $rowset->current();
-    }
-
-    public function getUsuarioTwitter(UsuarioTwitter $usuario)
-    {
-        $rowset = $this->tableGateway->select(['id_twitter' => $usuario->id]);
-        return $rowset->current();
-    }
-
-    public function getUsuarioLinkedin(UsuarioLinkedin $usuario)
-    {
-        $rowset = $this->tableGateway->select(['id_linkedin' => $usuario->id]);
-        return $rowset->current();
-    }
-
-    public function saveUsuario(Usuario $usuario)
-    {
-        $id = (int) $usuario->usuario_id;
+        $id = (int) $usuario->id;
 
         if ($id === 0) {
             return $this->insertUsuario($usuario);
@@ -126,24 +114,24 @@ class UsuarioTable
         return $this->updateUsuario($usuario);
     }
 
-    public function insertUsuario(Usuario $usuario)
+    public function insertUsuario(UsuarioTwitter $usuario)
     {
-        $usuario->usuario_registro = ['original' => date('Y-m-d H:i:s')];
-        $usuario->usuario_autorizado = ['original' => 0];
+        $usuario->inserido = ['original' => date('Y-m-d H:i:s')];
+        $usuario->atualizado = ['original' => 0];
         $this->tableGateway->insert($usuario->toArray());
-        $usuario->usuario_id = $this->tableGateway->getLastInsertValue();
+        $usuario->id = $this->tableGateway->getLastInsertValue();
     }
 
-    public function updateUsuario(Usuario $usuario)
+    public function updateUsuario(UsuarioTwitter $usuario)
     {
         $this->tableGateway->update(
             $usuario->toArray(),
-            ['usuario_id' => (int) $usuario->usuario_id]
+            ['id' => (int) $usuario->id]
         );
     }
 
     public function deleteUsuario($id)
     {
-        $this->tableGateway->delete(['usuario_id' => (int) $id]);
+        $this->tableGateway->delete(['id' => (int) $id]);
     }
 }
