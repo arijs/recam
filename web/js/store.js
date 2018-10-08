@@ -9,6 +9,13 @@ var services = RECAM.Services;
 var hasOwnProperty = Object.prototype.hasOwnProperty;
 var query = Utils.parseQuery(location.search);
 
+function validaObrigatoriedadeSenha(campo, context) {
+	if (!valida.trimValor(campo)) {
+		var rede = context.getters.sessionRedeUsuario;
+		return { falta: !Boolean(rede) };
+	}
+}
+
 var state = {
 	baseUrl: (RECAM.BaseUrl || ''),
 	query: query,
@@ -74,7 +81,7 @@ var state = {
 			erro: null,
 			falta: false,
 			valida: [
-				valida.naoVazio
+				validaObrigatoriedadeSenha
 			]
 		},
 		senhaConfirmacao: {
@@ -85,7 +92,7 @@ var state = {
 			erro: null,
 			falta: false,
 			valida: [
-				valida.naoVazio,
+				validaObrigatoriedadeSenha,
 				function(campo, context) {
 					var campoSenha = context.state.formUsuarioCadastrar.senha;
 					if (campo.valor !== campoSenha.valor) {
@@ -112,6 +119,38 @@ var state = {
 	serviceUsuarioCadastrarError: null
 };
 var getters = {
+	sessionFacebookId: function(state) {
+		var session = state.session;
+		var facebook = session && session.facebook;
+		var user = facebook && facebook.user;
+		if (user) {
+			return { id: user.id, id_facebook: user.id_facebook };
+		}
+	},
+	sessionGoogleId: function(state) {
+		var session = state.session;
+		var google = session && session.google;
+		var user = google && google.user;
+		if (user) {
+			return { id: user.id, id_google: user.id_google };
+		}
+	},
+	sessionTwitterId: function(state) {
+		var session = state.session;
+		var twitter = session && session.twitter;
+		var user = twitter && twitter.user;
+		if (user) {
+			return { id: user.id, id_twitter: user.id_twitter };
+		}
+	},
+	sessionLinkedinId: function(state) {
+		var session = state.session;
+		var linkedin = session && session.linkedin;
+		var user = linkedin && linkedin.user;
+		if (user) {
+			return { id: user.id, id_linkedin: user.id_linkedin };
+		}
+	},
 	getPostLoginRequestData: function(state, getters) {
 		return function() {
 			return {
@@ -127,12 +166,52 @@ var getters = {
 				name: formUC.nome.valor,
 				email: formUC.email.valor,
 				password: formUC.senha.valor,
-				password_confirm: formUC.senhaConfirmacao.valor
+				password_confirm: formUC.senhaConfirmacao.valor,
+				facebook: getters.sessionFacebookId,
+				google: getters.sessionGoogleId,
+				twitter: getters.sessionTwitterId,
+				linkedin: getters.sessionLinkedinId
 			};
 		};
+	},
+	sessionRedeUsuario: function(state) {
+		var session = state.session;
+		var rede = session && (session.facebook || session.google || session.linkedin || session.twitter);
+		var user = rede && rede.user;
+		if (user) {
+			return {
+				nome: user.nome,
+				email: user.email,
+				url_foto: user.url_foto
+			};
+		}
 	}
 };
 var actions = {
+	sessionUpdateFormCadastrar: function(context) {
+		var rede = context.getters.sessionRedeUsuario;
+		var form_uc = context.state.formUsuarioCadastrar;
+		context.commit('setFormCampoValor', {
+			campo: form_uc.nome,
+			valor: rede ? rede.nome : ''
+		});
+		context.commit('setFormCampoValor', {
+			campo: form_uc.email,
+			valor: rede ? rede.email : ''
+		});
+		context.commit('setFormCampoValor', {
+			campo: form_uc.senha,
+			valor: ''
+		});
+		context.commit('setFormCampoValor', {
+			campo: form_uc.senhaConfirmacao,
+			valor: ''
+		});
+		context.commit('setFormCampoRotulo', {
+			campo: form_uc.senha,
+			rotulo: rede ? 'Senha (opcional)' : 'Senha'
+		});
+	},
 	loadGetLogin: function(context) {
 		return new Promise(function(resolve, reject) {
 			context.commit('setGetLoginError', null);
@@ -148,7 +227,7 @@ var actions = {
 					} else {
 						context.commit('setGetLogin', data);
 						context.commit('setSession', data.session);
-						resolve();
+						resolve(context.dispatch('sessionUpdateFormCadastrar'));
 					}
 				}
 			);
@@ -169,7 +248,7 @@ var actions = {
 					} else {
 						context.commit('setPostLogin', data);
 						context.commit('setSession', data.session);
-						resolve();
+						resolve(context.dispatch('sessionUpdateFormCadastrar'));
 					}
 				}
 			);
@@ -331,6 +410,9 @@ var mutations = {
 	},
 	setFormCampoOpcoes: function(state, payload) {
 		payload.campo.opcoes = payload.opcoes;
+	},
+	setFormCampoRotulo: function(state, payload) {
+		payload.campo.rotulo = payload.rotulo;
 	},
 	setFormCampoErro: function(state, payload) {
 		var campo = payload.campo;
