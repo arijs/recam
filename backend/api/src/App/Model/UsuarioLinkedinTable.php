@@ -96,6 +96,13 @@ class UsuarioLinkedinTable
         return $rowset->current();
     }
 
+    public function saveUsuarioByIdLinkedin(UsuarioLinkedin $usuario)
+    {
+        $row = $this->getUsuarioByIdLinkedin($usuario->id_linkedin);
+        if (!empty($row)) $usuario->id = $row->id;
+        $this->saveUsuario($usuario);
+    }
+
     public function saveUsuario(UsuarioLinkedin $usuario)
     {
         $id = (int) $usuario->id;
@@ -109,16 +116,14 @@ class UsuarioLinkedinTable
 
     public function insertUsuario(UsuarioLinkedin $usuario)
     {
-        $usuario->inserido = ['original' => date('Y-m-d H:i:s')];
-        $usuario->atualizado = ['original' => 0];
-        $this->tableGateway->insert($usuario->toArray());
+        $this->tableGateway->insert($usuario->toArrayInsert());
         $usuario->id = $this->tableGateway->getLastInsertValue();
     }
 
     public function updateUsuario(UsuarioLinkedin $usuario)
     {
         $this->tableGateway->update(
-            $usuario->toArray(),
+            $usuario->toArrayUpdate(),
             ['id' => (int) $usuario->id]
         );
     }

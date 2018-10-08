@@ -99,7 +99,7 @@ class UsuarioTwitterTable
     public function saveUsuarioByIdTwitter(UsuarioTwitter $usuario)
     {
         $row = $this->getUsuarioByIdTwitter($usuario->id_twitter);
-        if (!empty($row)) $usuario->id = $row['id'];
+        if (!empty($row)) $usuario->id = $row->id;
         $this->saveUsuario($usuario);
     }
 
@@ -116,16 +116,14 @@ class UsuarioTwitterTable
 
     public function insertUsuario(UsuarioTwitter $usuario)
     {
-        $usuario->inserido = ['original' => date('Y-m-d H:i:s')];
-        $usuario->atualizado = ['original' => 0];
-        $this->tableGateway->insert($usuario->toArray());
+        $this->tableGateway->insert($usuario->toArrayInsert());
         $usuario->id = $this->tableGateway->getLastInsertValue();
     }
 
     public function updateUsuario(UsuarioTwitter $usuario)
     {
         $this->tableGateway->update(
-            $usuario->toArray(),
+            $usuario->toArrayUpdate(),
             ['id' => (int) $usuario->id]
         );
     }
