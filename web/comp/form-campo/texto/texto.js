@@ -79,7 +79,7 @@ RECAM.comp['form-campo/texto'] = {
           this.onAutoFill(false); break;
       }
       this.$emit('animationstart', evt);
-      console.log('animationstart', evt, this.autofill, this.cssClass);
+      // console.log('animationstart', evt, this.autofill, this.cssClass);
     },
     onAutoFill: function(af) {
       this.autofill = af;

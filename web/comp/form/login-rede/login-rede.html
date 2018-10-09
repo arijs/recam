@@ -1,10 +1,10 @@
-<div class="recam--form--login-rede">
+<div class="recam--form--login-rede" v-bind:class="{'lr-form-no-mb': !marginBottom}">
 
-	<div class="row" v-if="sessionFacebook">
-		<div class="col col-12 col-sm-3 pr-sm-0 pb-3">
+	<div class="row lr-rede lr-rede-card" v-if="sessionFacebook">
+		<div class="col col-12 col-sm-3 pr-sm-0">
 			<img class="img-fluid w-100" v-bind:src="sessionFacebook.user.url_foto" alt="Facebook picture" />
 		</div>
-		<div class="col pb-3">
+		<div class="col">
 			<div class="alert alert-primary h-100" role="alert">
 				<h5 class="card-title">
 					<span class="badge badge-primary">Facebook</span>
@@ -17,7 +17,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="form-group row" v-else-if="facebook">
+	<div class="row lr-rede lr-rede-btn" v-else-if="facebook">
 		<div class="col col-md-12">
 			<a v-bind:href="facebook" class="btn btn-primary btn-lg btn-block">Fazer login com Facebook</a>
 		</div>
@@ -28,11 +28,11 @@
 		</div>
 	</div> -->
 
-	<div class="row" v-if="sessionGoogle">
-		<div class="col col-12 col-sm-3 pr-sm-0 pb-3">
+	<div class="row lr-rede lr-rede-card" v-if="sessionGoogle">
+		<div class="col col-12 col-sm-3 pr-sm-0">
 			<img class="img-fluid w-100" v-bind:src="sessionGoogle.user.url_foto" alt="Google picture" />
 		</div>
-		<div class="col pb-3">
+		<div class="col">
 			<div class="alert alert-light border h-100" role="alert">
 				<h5 class="card-title">
 					<span class="badge badge-light">Google</span>
@@ -45,7 +45,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="form-group row" v-else-if="google">
+	<div class="row lr-rede lr-rede-btn" v-else-if="google">
 		<div class="col-md-12">
 			<a v-bind:href="google" class="btn btn-light btn-lg btn-block">Fazer login com Google</a>
 		</div>
@@ -56,11 +56,11 @@
 		</div>
 	</div> -->
 
-	<div class="row" v-if="sessionTwitter">
-		<div class="col col-12 col-sm-3 pr-sm-0 pb-3">
+	<div class="row lr-rede lr-rede-card" v-if="sessionTwitter">
+		<div class="col col-12 col-sm-3 pr-sm-0">
 			<img class="img-fluid w-100" v-bind:src="sessionTwitter.user.url_foto" alt="Twitter picture" />
 		</div>
-		<div class="col pb-3">
+		<div class="col">
 			<div class="alert alert-secondary h-100" role="alert">
 				<h5 class="card-title">
 					<span class="badge badge-secondary">Twitter</span>
@@ -73,7 +73,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="form-group row" v-else-if="twitter">
+	<div class="row lr-rede lr-rede-btn" v-else-if="twitter">
 		<div class="col-md-12">
 			<a v-bind:href="twitter" class="btn btn-secondary btn-lg btn-block">Fazer login com Twitter</a>
 		</div>
@@ -84,11 +84,11 @@
 		</div>
 	</div> -->
 
-	<div class="row" v-if="sessionLinkedin">
-		<div class="col col-12 col-sm-3 pr-sm-0 pb-3">
+	<div class="row lr-rede lr-rede-card" v-if="sessionLinkedin">
+		<div class="col col-12 col-sm-3 pr-sm-0">
 			<img class="img-fluid w-100" v-bind:src="sessionLinkedin.user.url_foto" alt="Linkedin picture" />
 		</div>
-		<div class="col pb-3">
+		<div class="col">
 			<div class="alert alert-info h-100" role="alert">
 				<h5 class="card-title">
 					<span class="badge badge-info">Linkedin</span>
@@ -101,7 +101,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="form-group row" v-else-if="linkedin">
+	<div class="row lr-rede lr-rede-btn" v-else-if="linkedin">
 		<div class="col-md-12">
 			<a v-bind:href="linkedin" class="btn btn-info btn-lg btn-block">Fazer login com LinkedIn</a>
 		</div>

@@ -1,13 +1,13 @@
 <div class="recam--form--usuario--cadastrar">
 
-	<div v-if="sucesso">
+	<!-- <div v-if="sucesso">
 		<div class="alert alert-success" role="alert">
 			<p><strong>Cadastro realizado com sucesso!</strong></p>
 		</div>
 		<p>O administrador irá verificar seus dados e realizar a liberação de acesso.</p>
 		<p>Você receberá um aviso por e-mail quando isso acontecer.</p>
-	</div>
-	<form v-else class="form-horizontal" action="javascript:;" v-on:submit="clickSubmit">
+	</div> -->
+	<form class="form-horizontal" action="javascript:;" v-on:submit="clickSubmit">
 		<div class="form-group row">
 			<!-- <label class="col-md-4 col-form-label">Nome</label> -->
 			<div class="col-md-12">
@@ -56,14 +56,15 @@
 				></recam--form-campo--texto>
 			</div>
 		</div>
-		<div v-if="erro" class="alert alert-danger" role="alert">
-			<p class="mb-0" v-text="erro"></p>
+		<div v-if="erro" class="alert alert-danger uc-form-erro" role="alert">
+			<p v-for="erroItem in erro" v-text="erroItem"></p>
 		</div>
 		<div class="form-group row mb-0">
 			<!-- <label class="col-md-4 col-form-label"></label> -->
 			<div class="col-md-12">
 				<button v-if="usuarioCadastrarLoading" type="button" class="btn btn-secondary" disabled>Aguarde...</button>
 				<button v-else type="submit" class="btn btn-primary">Cadastrar</button>
+				<a v-if="redeUsuario" v-bind:href="baseUrl+'api/logout'" class="btn btn-link float-right">Sair</a>
 			</div>
 		</div>
 	</form>

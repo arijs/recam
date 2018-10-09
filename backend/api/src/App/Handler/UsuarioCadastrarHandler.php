@@ -46,15 +46,58 @@ class UsuarioCadastrarHandler implements RequestHandlerInterface
         ], 405);
     }
 
+    public function validateRede($session, $name, $params, &$login_redes, &$error_redes)
+    {
+        $value = isset($params[$name]) ? $params[$name] : null;
+        $valid = false;
+        if (!empty($value)) {
+            $value = explode(' ', $value);
+            $rede = isset($session[$name]) ? $session[$name] : null;
+            $rede = isset($rede, $rede['user']) ? $rede['user'] : null;
+            if (empty($rede)) {
+                $error_redes[] = "Login {$name} não encontrado, faça o login novamente";
+            } else {
+                $id_name = 'id_'.$name;
+                $id_row = isset($rede['id'], $value[0]) ? $rede['id'] == $value[0] : false;
+                $id_rede = isset($rede[$id_name], $value[1]) ? $rede[$id_name] == $value[1] : false;
+                $valid = $id_row && $id_rede;
+                if (!$id_row) {
+                    $error_redes[] = "Login {$name}: id banco inválido";
+                }
+                if (!$id_rede) {
+                    $error_redes[] = "Login {$name}: id rede inválido";
+                }
+                if ($valid) {
+                    $login_redes[] = [
+                        'name' => $name,
+                        'user' => $rede
+                    ];
+                }
+            }
+        }
+        return $valid;
+    }
+
     public function authenticate(ServerRequestInterface $request)
     {
         $params = $request->getParsedBody();
         $baseUrl = $request->getAttribute(\App\Middleware\InjectBaseUrlMiddleware::class);
+        $session = $request->getAttribute(\App\Middleware\InjectAuthMiddleware::class);
 
         $name = isset($params['name']) ? $params['name'] : null;
         $email = isset($params['email']) ? $params['email'] : null;
         $password = isset($params['password']) ? $params['password'] : null;
         $password_confirm = isset($params['password_confirm']) ? $params['password_confirm'] : null;
+
+        $redes_name = ['facebook', 'google', 'twitter', 'linkedin'];
+
+        // $facebook = isset($params['facebook']) ? $params['facebook'] : null;
+        // $google = isset($params['google']) ? $params['google'] : null;
+        // $twitter = isset($params['twitter']) ? $params['twitter'] : null;
+        // $linkedin = isset($params['linkedin']) ? $params['linkedin'] : null;
+
+        $login_redes = [];
+        $error_redes = [];
 
         $error_name = [];
         $error_email = [];
@@ -62,6 +105,10 @@ class UsuarioCadastrarHandler implements RequestHandlerInterface
         $error_password_confirm = [];
         $register_success = false;
         $emailValidator = new EmailAddress();
+
+        foreach ($redes_name as $rede_name) {
+            $this->validateRede($session, $rede_name, $params, $login_redes, $error_redes);
+        }
 
         if (empty($name)) {
             // return new HtmlResponse($this->template->render('app::login', [
@@ -82,16 +129,18 @@ class UsuarioCadastrarHandler implements RequestHandlerInterface
             $error_email[] = 'Já existe um usuário com esse e-mail! ('.$userEmail->usuario_nome.')';
         }
 
-        if (empty($password)) {
-            $error_password[] = 'A senha está vazia!';
-        }
+        if (empty($login_redes)) {
+            if (empty($password)) {
+                $error_password[] = 'A senha está vazia!';
+            }
 
-        if (empty($password_confirm)) {
-            $error_password_confirm[] = 'É necessário confirmar a senha!';
-        }
+            if (empty($password_confirm)) {
+                $error_password_confirm[] = 'É necessário confirmar a senha!';
+            }
 
-        else if ($password_confirm !== $password) {
-            $error_password_confirm[] = 'A senha e a confirmação da senha são diferentes!';
+            else if ($password_confirm !== $password) {
+                $error_password_confirm[] = 'A senha e a confirmação da senha são diferentes!';
+            }
         }
 
         $errors = [];
@@ -99,6 +148,7 @@ class UsuarioCadastrarHandler implements RequestHandlerInterface
         if (!empty($error_email)) $errors['email'] = $error_email;
         if (!empty($error_password)) $errors['password'] = $error_password;
         if (!empty($error_password_confirm)) $errors['password_confirm'] = $error_password_confirm;
+        if (!empty($error_redes)) $errors['redes'] = $error_redes;
 
         if (empty($errors)) {
             $usuario = new Usuario();
@@ -106,6 +156,9 @@ class UsuarioCadastrarHandler implements RequestHandlerInterface
             $usuario->usuario_nome = $name;
             $usuario->usuario_email = $email;
             $usuario->usuario_senha = $password;
+            foreach ($login_redes as $login_rede) {
+                $usuario->{'id_'.$login_rede['name']} = $login_rede['user']['id'];
+            }
             $this->usuarioTable->insertUsuario($usuario);
             $register_success = true;
         }

@@ -5,6 +5,35 @@ var RECAM = RECAM || {};
 	var Utils = RECAM.Utils;
 	var Env = RECAM.Env;
 
+	function validateRede(key, name, val) {
+		if (!this.redesMap[key]) {
+			this.invalid.push(name);
+			return false;
+		}
+		if (val) {
+			if (!val.id || !val['id_'+key]) {
+				this.invalid.push(name);
+				return false;
+			}
+			this.redesAtivas.push(key);
+		}
+		return true;
+	}
+	function validateNaoVazio(key, name, val) {
+		if (!val) {
+			this.missing.push(name);
+			return false;
+		}
+		return true;
+	}
+	function opcionalSeLoginRede(key, name, val) {
+		if (!val && this.redesAtivas.length == 0) {
+			this.missing.push(name);
+			return false;
+		}
+		return true;
+	}
+
 	var services = {
 		getLogin: function(req, callback) {
 			Utils.loadService({
@@ -81,17 +110,41 @@ var RECAM = RECAM || {};
 							message: 'Dados do login não informados'
 						};
 					}
-					var fields = {
-						name: 'nome',
-						email: 'e-mail',
-						password: 'senha',
-						password_confirm: 'confirmação da senha'
+					var redes = ['facebook', 'google', 'twitter', 'linkedin'];
+					var ctx = {
+						req: req,
+						missing: [],
+						invalid: [],
+						redesMap: Utils.forEach(redes, {}, function(name) {
+							this.result[name] = true;
+						}),
+						redesAtivas: []
 					};
-					var missing = [];
-					Utils.forEachProperty(fields, function(text, name) {
-						if (!req[name]) missing.push(text);
+					var fields = [
+						{key: 'facebook', name: 'login Facebook', val: validateRede},
+						{key: 'google', name: 'login Google', val: validateRede},
+						{key: 'twitter', name: 'login Twitter', val: validateRede},
+						{key: 'linkedin', name: 'login Linkedin', val: validateRede},
+						{key: 'name', name: 'nome', val: validateNaoVazio},
+						{key: 'email', name: 'e-mail', val: validateNaoVazio},
+						{key: 'password', name: 'senha', val: opcionalSeLoginRede},
+						{key: 'password_confirm', name: 'confirmação da senha', val: opcionalSeLoginRede}
+					];
+
+					Utils.forEach(fields, function(f) {
+						f.val.call(ctx, f.key, f.name, req[f.key]);
 					});
-					if (missing.length) {
+					var invalid = ctx.invalid;
+					var missing = ctx.missing;
+					if (invalid.length) {
+						return {
+							message: (1 === invalid.length
+							? 'Campo inválido: '
+							: 'Campos inválidos: ') +
+							invalid.join(', ')
+						};
+					}
+					if (ctx.missing.length) {
 						return {
 							message: (1 === missing.length
 							? 'Campo não informado: '

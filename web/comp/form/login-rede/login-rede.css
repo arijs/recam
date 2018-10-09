@@ -1,3 +1,9 @@
-.recam--form--login-rede .form-group:last-child {
+.recam--form--login-rede .lr-rede {
+	margin-bottom: 1rem;
+}
+.recam--form--login-rede .lr-rede-card .alert {
+	margin-bottom: 0;
+}
+.recam--form--login-rede.lr-form-no-mb .lr-rede:last-child {
 	margin-bottom: 0;
 }

@@ -4,6 +4,9 @@ var Utils = RECAM.Utils;
 
 RECAM.comp['form/usuario/cadastrar'] = {
 	computed: {
+		baseUrl: function() {
+			return this.$store.state.baseUrl;
+		},
 		campos: function() {
 			return this.$store.state.formUsuarioCadastrar;
 		},
@@ -13,6 +16,9 @@ RECAM.comp['form/usuario/cadastrar'] = {
 		sucesso: function() {},
 		usuarioCadastrarLoading: function() {
 			return this.$store.state.serviceUsuarioCadastrarLoading;
+		},
+		redeUsuario: function() {
+			return this.$store.getters.sessionRedeUsuario;
 		}
 	},
 	methods: {
@@ -51,7 +57,7 @@ RECAM.comp['form/usuario/cadastrar'] = {
 							if (!errorList.length) {
 								errorList.push(error.message || 'Erro ao fazer o cadastro. Tente novamente mais tarde.');
 							}
-							context.commit('setFormUsuarioCadastrarErro', errorList.join(' / '));
+							context.commit('setFormUsuarioCadastrarErro', errorList);
 						}
 					});
 				}

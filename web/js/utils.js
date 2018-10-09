@@ -126,13 +126,18 @@ Utils.parseQuery = function parseQuery(param) {
 	return obj;
 };
 
-Utils.stringifyQuery = function stringifyQuery(param) {
+Utils.stringifyQuery = function stringifyQuery(param, opt) {
 	var arr = [];
+	var strObject = String({});
 	for ( var key in param ) {
 		if ( hop.call(param, key) ) {
+			var val = String(param[key]);
+			if ((val === strObject) && opt && opt.encodeObject) {
+				val = String(opt.encodeObject(param[key], key));
+			}
 			var pair = [
 				window.encodeURIComponent(key),
-				window.encodeURIComponent(String(param[key]))
+				window.encodeURIComponent(val)
 			];
 			arr.push(pair.join('='));
 		}

@@ -3,6 +3,12 @@
 var Utils = RECAM.Utils;
 
 RECAM.comp['form/login-rede'] = {
+	props: {
+		marginBottom: {
+			type: Boolean,
+			default: false
+		}
+	},
 	computed: {
 		facebook: function() {
 			var login = this.$store.state.serviceGetLogin;
