@@ -37,6 +37,6 @@ class LogoutHandler implements RequestHandlerInterface
         $this->auth->clearIdentity();
 
         $baseUrl = $request->getAttribute(\App\Middleware\InjectBaseUrlMiddleware::class);
-        return new RedirectResponse($baseUrl.'/login');
+        return new RedirectResponse('/');//$baseUrl.'/login');
     }
 }

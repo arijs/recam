@@ -37,13 +37,24 @@ var RECAM = RECAM || {};
 	};
 
 	services.usuarioCadastrar = function(req, cb) {
+		var redes = ['facebook', 'google', 'twitter', 'linkedin'];
+		redes = Utils.forEach(redes, {}, function(name) {
+			this.result[name] = function(val) {
+				return [val.id, val['id_'+name]].join(' ');
+			};
+		})
 		return {
 			method: 'POST',
 			url: '/api/usuario/cadastrar',
 			headers: [
 				{ name: 'Content-Type', value: 'application/x-www-form-urlencoded; charset=UTF-8' }
 			],
-			body: Utils.stringifyQuery(req),
+			body: Utils.stringifyQuery(req, {
+				encodeObject: function(val, name) {
+					var encodeRede = redes[name];
+					return encodeRede ? encodeRede(val) : val;
+				}
+			}),
 			cb: cb
 		};
 	};

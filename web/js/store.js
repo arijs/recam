@@ -151,6 +151,18 @@ var getters = {
 			return { id: user.id, id_linkedin: user.id_linkedin };
 		}
 	},
+	sessionRedeUsuario: function(state) {
+		var session = state.session;
+		var rede = session && (session.facebook || session.google || session.linkedin || session.twitter);
+		var user = rede && rede.user;
+		if (user) {
+			return {
+				nome: user.nome,
+				email: user.email,
+				url_foto: user.url_foto
+			};
+		}
+	},
 	getPostLoginRequestData: function(state, getters) {
 		return function() {
 			return {
@@ -173,18 +185,6 @@ var getters = {
 				linkedin: getters.sessionLinkedinId
 			};
 		};
-	},
-	sessionRedeUsuario: function(state) {
-		var session = state.session;
-		var rede = session && (session.facebook || session.google || session.linkedin || session.twitter);
-		var user = rede && rede.user;
-		if (user) {
-			return {
-				nome: user.nome,
-				email: user.email,
-				url_foto: user.url_foto
-			};
-		}
 	}
 };
 var actions = {
