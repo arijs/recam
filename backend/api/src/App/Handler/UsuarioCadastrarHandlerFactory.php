@@ -6,7 +6,9 @@ namespace App\Handler;
 
 use Psr\Container\ContainerInterface;
 use Zend\Expressive\Template\TemplateRendererInterface;
+use Zend\Authentication\AuthenticationService;
 use \App\Model\UsuarioTable;
+use \App\MyAuthAdapter;
 
 class UsuarioCadastrarHandlerFactory
 {
@@ -14,7 +16,9 @@ class UsuarioCadastrarHandlerFactory
     {
         return new UsuarioCadastrarHandler(
             $container->get(TemplateRendererInterface::class),
-            $container->get(UsuarioTable::class)
+            $container->get(UsuarioTable::class),
+            $container->get(AuthenticationService::class),
+            $container->get(MyAuthAdapter::class)
         );
     }
 }

@@ -12,6 +12,8 @@ use Zend\Diactoros\Response\JsonResponse;
 use Zend\Expressive\Template\TemplateRendererInterface;
 // use Zend\Expressive\Router\RouterInterface;
 use Zend\Validator\EmailAddress;
+use Zend\Authentication\AuthenticationService;
+use \App\MyAuthAdapter;
 use \App\Model\Usuario;
 use \App\Model\UsuarioTable;
 
@@ -20,15 +22,21 @@ class UsuarioCadastrarHandler implements RequestHandlerInterface
     // private $router;
     private $template;
     private $usuarioTable;
+    private $auth;
+    private $authAdapter;
 
     public function __construct(
         // RouterInterface $router,
         TemplateRendererInterface $template,
-        UsuarioTable $usuarioTable
+        UsuarioTable $usuarioTable,
+        AuthenticationService $auth,
+        MyAuthAdapter $authAdapter
     ) {
         // $this->router       = $router;
         $this->template     = $template;
         $this->usuarioTable = $usuarioTable;
+        $this->auth         = $auth;
+        $this->authAdapter  = $authAdapter;
     }
 
     /**
@@ -46,7 +54,7 @@ class UsuarioCadastrarHandler implements RequestHandlerInterface
         ], 405);
     }
 
-    public function validateRede($session, $name, $params, &$login_redes, &$error_redes)
+    public function validateRede($session, $name, $params, &$login_redes, &$id_redes, &$error_redes)
     {
         $value = isset($params[$name]) ? $params[$name] : null;
         $valid = false;
@@ -68,10 +76,8 @@ class UsuarioCadastrarHandler implements RequestHandlerInterface
                     $error_redes[] = "Login {$name}: id rede inválido";
                 }
                 if ($valid) {
-                    $login_redes[] = [
-                        'name' => $name,
-                        'user' => $rede
-                    ];
+                    $login_redes[] = $rede;
+                    $id_redes[$id_name] = $rede['id'];
                 }
             }
         }
@@ -97,6 +103,7 @@ class UsuarioCadastrarHandler implements RequestHandlerInterface
         // $linkedin = isset($params['linkedin']) ? $params['linkedin'] : null;
 
         $login_redes = [];
+        $id_redes = [];
         $error_redes = [];
 
         $error_name = [];
@@ -107,7 +114,7 @@ class UsuarioCadastrarHandler implements RequestHandlerInterface
         $emailValidator = new EmailAddress();
 
         foreach ($redes_name as $rede_name) {
-            $this->validateRede($session, $rede_name, $params, $login_redes, $error_redes);
+            $this->validateRede($session, $rede_name, $params, $login_redes, $id_redes, $error_redes);
         }
 
         if (empty($name)) {
@@ -156,10 +163,16 @@ class UsuarioCadastrarHandler implements RequestHandlerInterface
             $usuario->usuario_nome = $name;
             $usuario->usuario_email = $email;
             $usuario->usuario_senha = $password;
-            foreach ($login_redes as $login_rede) {
-                $usuario->{'id_'.$login_rede['name']} = $login_rede['user']['id'];
+            foreach ($id_redes as $rede_col => $rede_id) {
+                $usuario->{$rede_col} = $rede_id;
             }
             $this->usuarioTable->insertUsuario($usuario);
+
+            if ($this->auth->hasIdentity()) {
+                $this->authAdapter->setCurrentIdentity($this->auth->getIdentity());
+            }
+            $this->authAdapter->setUsuario($usuario);
+            $result = $this->auth->authenticate();
             $register_success = true;
         }
 

@@ -38,6 +38,8 @@ Vue.component('vnode', {
 	}
 });
 
+var strObject = String({});
+
 Vue.options.componentDynamic('recam--root')(
 	function(compRoot) {
 		compRoot.store = RECAM.store;
@@ -47,12 +49,26 @@ Vue.options.componentDynamic('recam--root')(
 		RECAM.$root = root;
 	},
 	function(err) {
-		new Vue({
-			el: '#recam-mount',
+		var CompError = Vue.extend({
 			template: '<div class="recam--component-error">'
-				+ Utils.htmlEntitiesEncode(String(err))
-				+ '</div>'
+				+ '<pre v-text="errorText"></pre>'
+				+ '</div>',
+			data: function() {
+				return { error: err };
+			},
+			computed: {
+				errorText: function() {
+					var err = this.error;
+					if (String(err) === strObject) {
+						err = JSON.stringify(err, null, 2);
+					}
+					return err;
+				}
+			}
 		});
+		var root = new CompError();
+		root.$mount('#recam-mount');
+		RECAM.$rootError = root;
 	}
 );
 
