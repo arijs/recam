@@ -8,8 +8,8 @@
 				<span class="list-group-item">Registrado em: {{printModelDate(usuario.usuario_registro)}}</span>
 				<span class="list-group-item">Autorizado em: {{usuario.usuario_autorizado ? printModelDate(usuario.usuario_autorizado) : '(autorização pendente)'}}</span>
 				<span class="list-group-item">Você acessou {{1 === acesso.acesso_contagem ? '1 vez' : acesso.acesso_contagem+' vezes'}} em {{printModelDate(acesso.acesso_data)}}</span>
-				<span class="list-group-item">Primeiro horário: {{printModelDate(acesso.acesso_hora_inicial)}}</span>
-				<span class="list-group-item">Último horário: {{printModelDate(acesso.acesso_hora_final)}}</span>
+				<span class="list-group-item">Primeiro horário: {{acesso.acesso_hora_inicial}}</span>
+				<span class="list-group-item">Último horário: {{acesso.acesso_hora_final}}</span>
 				<span v-if="logoutLoading" class="list-group-item">Aguarde, fazendo logout...</span>
 				<a href="javascript:;" v-else class="list-group-item" v-on:click="clickLogout">Logout</a>
 			</div>

@@ -84,6 +84,17 @@ class MyAuthAdapter implements AdapterInterface
         $this->paypal = $paypal;
     }
 
+    public function registerAcessoUsuario(Model\Usuario $usuario)
+    {
+        $acesso = $this->usuarioAcessoTable->getAcessoDeHoje($usuario->usuario_id);
+        if (empty($acesso)) {
+            $acesso = $this->usuarioAcessoTable->criarAcessoDeHoje($usuario->usuario_id);
+        } else {
+            $acesso = $this->usuarioAcessoTable->updateAcessoDeHoje($acesso);
+        }
+        return $acesso;
+    }
+
     /**
      * Performs an authentication attempt
      *
@@ -122,15 +133,10 @@ class MyAuthAdapter implements AdapterInterface
                         'Sua conta ainda não foi autorizada pelo administrador!',
                     ]);
                 }*/
-                $acesso = $this->usuarioAcessoTable->getAcessoDeHoje($usuario->usuario_id);
-                if (empty($acesso)) {
-                    $acesso = $this->usuarioAcessoTable->criarAcessoDeHoje($usuario->usuario_id);
-                } else {
-                    $acesso = $this->usuarioAcessoTable->updateAcessoDeHoje($acesso);
-                }
-                $identity['username'] = $u;
-                $identity['usuario'] = $usuario;
-                $identity['acesso'] = $acesso;
+                $acesso = $this->registerAcessoUsuario($usuario);
+                $identity['username'] = $usuario->usuario_email;
+                $identity['usuario'] = $usuario->toArray();
+                $identity['acesso'] = $acesso->toArray();
                 $success = true;
             } else {
                 return new Result(Result::FAILURE_CREDENTIAL_INVALID, $u, [
@@ -177,6 +183,34 @@ class MyAuthAdapter implements AdapterInterface
                 'Nenhuma credencial informada'
             ]);
         }
+    }
+
+    public function sessionObjectToArray($session)
+    {
+        if (empty($session)) return;
+        $array = [];
+        if (!empty($session['usuario'])) {
+            $usuario = $session['usuario'];
+            $array['usuario'] = ($usuario instanceof Model\Usuario)
+                ? $usuario->toArray()
+                : $usuario;
+        }
+        if (!empty($session['acesso'])) {
+            $acesso = $session['acesso'];
+            $array['acesso'] = ($acesso instanceof Model\UsuarioAcesso)
+                ? $acesso->toArray()
+                : $acesso;
+        }
+        if (!empty($session['username'])) {
+            $array['username'] = $session['username'];
+        }
+        $redes = ['facebook', 'google', 'twitter', 'linkedin'];
+        foreach ($redes as $r) {
+            if (!empty($session[$r])) {
+                $array[$r] = $session[$r];
+            }
+        }
+        return $array;
     }
 
     public function getFacebookProvider($returnUrl)

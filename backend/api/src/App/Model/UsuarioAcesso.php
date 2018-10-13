@@ -51,10 +51,10 @@ class UsuarioAcesso
       $hora_final   = !empty($hora_final  ['original']) ? $hora_final  ['original'] : null;
       $data = [
           'usuario_id'          => $this->usuario_id,
-          'acesso_data'         => $this->acesso_data,
+          'acesso_data'         => $data,
           'acesso_contagem'     => $this->acesso_contagem,
-          'acesso_hora_inicial' => $this->acesso_hora_inicial,
-          'acesso_hora_final'   => $this->acesso_hora_final,
+          'acesso_hora_inicial' => $hora_inicial,
+          'acesso_hora_final'   => $hora_final,
       ];
       return $data;
     }
