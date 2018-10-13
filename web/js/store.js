@@ -289,6 +289,7 @@ var actions = {
 						resolve();
 					} else {
 						context.commit('setUsuarioCadastrar', data);
+						context.commit('setSession', data.session);
 						resolve();
 					}
 				}

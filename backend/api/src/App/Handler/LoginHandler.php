@@ -290,6 +290,9 @@ class LoginHandler implements RequestHandlerInterface
             // $response['paypal'] = $paypal['auth_url'];
             // $sessionContainer->authPaypalState = $paypal['state'];
         }
+        if (!empty($response['session'])) {
+            $response['session'] = $this->authAdapter->sessionObjectToArray($response['session']);
+        }
         return new JsonResponse($response);
 
         // return new HtmlResponse($this->template->render('app::login', [
@@ -330,8 +333,8 @@ class LoginHandler implements RequestHandlerInterface
         if (!empty($error_username)) $errors['username'] = $error_username;
         if (!empty($error_password)) $errors['password'] = $error_password;
         return new JsonResponse([
-            'baseUrl' => $request->getAttribute(\App\Middleware\InjectAuthMiddleware::class),
-            'session' => $session,
+            'baseUrl' => $request->getAttribute(\App\Middleware\InjectBaseUrlMiddleware::class),
+            'session' => $this->authAdapter->sessionObjectToArray($session),
             'errorFields' => empty($errors) ? null : $errors,
         ]);
         /* if (!$result->isValid()) {

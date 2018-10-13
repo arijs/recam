@@ -173,17 +173,24 @@ class UsuarioCadastrarHandler implements RequestHandlerInterface
             }
             $this->authAdapter->setUsuario($usuario);
             $result = $this->auth->authenticate();
-            $register_success = true;
+            if ($result->isValid()) {
+                $session = $result->getIdentity();
+                $register_success = true;
+            } else {
+                $errors = array_merge($errors, $result->getMessages());
+                $register_success = false;
+            }
         }
 
         return new JsonResponse([
-            'baseUrl' => $request->getAttribute(\App\Middleware\InjectAuthMiddleware::class),
+            'baseUrl' => $request->getAttribute(\App\Middleware\InjectBaseUrlMiddleware::class),
             'error' => !$register_success,
             'errorFields' => empty($errors) ? null : $errors,
             'register_name' => $name,
             'register_email' => $email,
             // 'register_password' => $password,
-            'usuario' => $usuario,
+            // 'usuario' => $usuario,
+            'session' => $session,
             // 'register_' => $,
         ], $register_success ? 200 : (empty($errors) ? 500 : 400));
     }

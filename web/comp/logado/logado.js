@@ -1,6 +1,7 @@
 (function() {
 
 var Utils = RECAM.Utils;
+var reDate = /(\d+)-(\d+)-(\d+)/;
 
 RECAM.comp['logado'] = {
 	computed: {
@@ -18,7 +19,16 @@ RECAM.comp['logado'] = {
 		}
 	},
 	methods: {
-		printModelDate: Utils.printModelDate,
+		printModelDate: function(dt) {
+			var m = String(dt||'').match(reDate);
+			if (m) {
+				return [
+					Utils.padStart(m[3],2,'0'),
+					Utils.padStart(m[2],2,'0'),
+					m[1]
+				].join('/');
+			}
+		},
 		clickLogout: function() {
 			this.$store.dispatch('loadLogout');
 		}
