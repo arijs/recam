@@ -116,7 +116,10 @@ var state = {
 	serviceLogoutError: null,
 	serviceUsuarioCadastrar: null,
 	serviceUsuarioCadastrarLoading: false,
-	serviceUsuarioCadastrarError: null
+	serviceUsuarioCadastrarError: null,
+	serviceUsuarioLocalReuniao: null,
+	serviceUsuarioLocalReuniaoLoading: false,
+	serviceUsuarioLocalReuniaoError: null
 };
 var getters = {
 	sessionFacebookId: function(state) {
@@ -296,6 +299,26 @@ var actions = {
 			);
 		});
 	},
+	loadUsuarioLocalReuniao: function(context, payload) {
+		context.commit('setUsuarioLocalReuniaoError', null);
+		context.commit('setUsuarioLocalReuniao', null);
+		return new Promise(function(resolve, reject) {
+			services.usuarioLocalReuniao(
+				payload,
+				function(loading, error, data) {
+					context.commit('setUsuarioLocalReuniaoLoading', loading);
+					if (loading) return;
+					if (error) {
+						context.commit('setUsuarioLocalReuniaoError', error);
+						resolve();
+					} else {
+						context.commit('setUsuarioLocalReuniao', data);
+						resolve();
+					}
+				}
+			);
+		});
+	},
 	testaCampo: function(context, campo) {
 		var validacao = null;
 		if (campo.valida) {
@@ -394,6 +417,15 @@ var mutations = {
 	},
 	setUsuarioCadastrarError: function(state, error) {
 		state.serviceUsuarioCadastrarError = error;
+	},
+	setUsuarioLocalReuniao: function(state, data) {
+		state.serviceUsuarioLocalReuniao = data;
+	},
+	setUsuarioLocalReuniaoLoading: function(state, loading) {
+		state.serviceUsuarioLocalReuniaoLoading = loading;
+	},
+	setUsuarioLocalReuniaoError: function(state, error) {
+		state.serviceUsuarioLocalReuniaoError = error;
 	},
 	setPageScroll: function(state, ps) {
 		var sps = state.pageScroll;

@@ -1,0 +1,15 @@
+.recam--logado--mapa--info-salao {
+	max-width: 13rem;
+}
+.recam--logado--mapa--info-salao .lmi-address p {
+	margin: 0;
+}
+.recam--logado--mapa--info-salao .lmi-cong-list {
+	margin: 0;
+}
+.recam--logado--mapa--info-salao .lmi-cong {
+	margin: 1em 0 0;
+}
+.recam--logado--mapa--info-salao .lmi-confirm-buttons {
+	margin-bottom: 0;
+}

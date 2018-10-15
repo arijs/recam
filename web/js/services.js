@@ -161,6 +161,27 @@ var RECAM = RECAM || {};
 					}
 				}
 			});
+		},
+		usuarioLocalReuniao: function(req, callback) {
+			Utils.loadService({
+				req: req,
+				envPrepare: Env.Services.usuarioLocalReuniao,
+				callback: callback,
+				reqValidate: function(req) {
+					if (!req || !req.usuario_id || !req.reuniao_id || !req.geo_id) {
+						return {
+							message: 'Um ou mais dados faltando na requisição'
+						};
+					}
+				},
+				dataValidate: function(data) {
+					if (!data) {
+						return {
+							message: 'Resposta vazia do servidor'
+						};
+					}
+				}
+			});
 		}
 	};
 

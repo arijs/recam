@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Psr\Container\ContainerInterface;
 use Zend\Expressive\Application;
 use Zend\Expressive\MiddlewareFactory;
+use App\Middleware\CheckAuthMiddleware;
 
 /**
  * Setup routes with a single request method:
@@ -36,9 +37,22 @@ return function (Application $app, MiddlewareFactory $factory, ContainerInterfac
     $app->route('/login', App\Handler\LoginHandler::class, ['GET', 'POST'], 'login');
     $app->get('/logout', App\Handler\LogoutHandler::class, 'logout');
     $app->post('/usuario/cadastrar', App\Handler\UsuarioCadastrarHandler::class, 'usuario.cadastrar');
-    $app->get('/meeting-locations', App\Handler\WeeklyMeetings::class, 'meeting-locations');
-    $app->get('/meeting-locations-db', App\Handler\WeeklyMeetingsDb::class, 'meeting-locations-db');
+    $app->post('/usuario/local-reuniao', [
+        App\Middleware\CheckAuthMiddleware::class,
+        App\Handler\UsuarioLocalReuniaoHandler::class,
+    ], 'usuario.local-reuniao');
+    $app->get('/meeting-locations', [
+        App\Middleware\CheckAuthMiddleware::class,
+        App\Handler\WeeklyMeetings::class
+    ], 'meeting-locations');
+    $app->get('/meeting-locations-db', [
+        App\Middleware\CheckAuthMiddleware::class,
+        App\Handler\WeeklyMeetingsDb::class
+    ], 'meeting-locations-db');
     $app->get('/', App\Handler\HomePageHandler::class, 'home');
     $app->get('/api/ping', App\Handler\PingHandler::class, 'api.ping');
-    $app->route('/mail', App\Handler\MailHandler::class, ['GET', 'POST'], 'mail');
+    $app->route('/mail', [
+        App\Middleware\CheckAuthMiddleware::class,
+        App\Handler\MailHandler::class
+    ], ['GET', 'POST'], 'mail');
 };

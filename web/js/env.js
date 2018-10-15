@@ -59,4 +59,16 @@ var RECAM = RECAM || {};
 		};
 	};
 
+	services.usuarioLocalReuniao = function(req, cb) {
+		return {
+			method: 'POST',
+			url: '/api/usuario/local-reuniao',
+			headers: [
+				{ name: 'Content-Type', value: 'application/x-www-form-urlencoded; charset=UTF-8' }
+			],
+			body: Utils.stringifyQuery(req),
+			cb: cb
+		};
+	};
+
 })();

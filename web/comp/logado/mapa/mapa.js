@@ -2,6 +2,8 @@
 
 var Utils = RECAM.Utils;
 var hop = Object.prototype.hasOwnProperty;
+var INFOSALAO_LOADING = {};
+var INFOSALAO_ERROR = {};
 
 RECAM.comp['logado/mapa'] = {
 	data: function() {
@@ -10,7 +12,13 @@ RECAM.comp['logado/mapa'] = {
 			loadingJW: false,
 			lastQuery: null,
 			meetingLocations: {},
-			selectedMeeting: null,
+			selectedSalao: null,
+			selectedPropsData: {
+				salao: null,
+				saveLoading: false,
+				saveError: null,
+				saveData: null
+			},
 			lastStats: null,
 			loadStats: []
 		};
@@ -64,25 +72,109 @@ RECAM.comp['logado/mapa'] = {
 				vm.loadLocationsDBDebounce();
 			});
 		},
+		selectMeetingLocation: function(ml) {
+			console.log(ml);
+			var vm = this;
+			vm.selectedPropsData.saveLoading = true;
+			this.$store.dispatch('loadUsuarioLocalReuniao', {
+				usuario_id: vm.$store.state.session.usuario.usuario_id,
+				reuniao_id: ml['-rdc-meta'].id,
+				geo_id: ml.geoId
+			}).then(function() {
+				vm.selectedPropsData.saveError = vm.$store.state.serviceUsuarioLocalReuniaoError;
+				vm.selectedPropsData.saveData = vm.$store.state.serviceUsuarioLocalReuniao;
+				vm.selectedPropsData.saveLoading = false;
+				// console.log(
+				// 	vm.$store.state.serviceUsuarioLocalReuniaoError,
+				// 	vm.$store.state.serviceUsuarioLocalReuniao
+				// );
+			})
+		},
+		findSalaoNearMeetingLocation: function(ml) {
+			var maxDistance = 1/1024;
+			var mlLat = ml.location.latitude;
+			var mlLng = ml.location.longitude;
+			var near;
+			Utils.forEachProperty(this.saloes, function(s) {
+				Utils.forEach(s.meetingLocations, function(sml) {
+					var dlat = mlLat - sml.location.latitude;
+					var dlng = mlLng - sml.location.longitude;
+					if (
+						dlat < maxDistance &&
+						dlat > -maxDistance &&
+						dlng < maxDistance &&
+						dlng > -maxDistance
+					) {
+						near = {
+							salao: s,
+							ml: sml,
+							dlat: dlat,
+							dlng: dlng
+						};
+						return this._break;
+					}
+				});
+			});
+			return near;
+		},
 		addMarker: function(ml) {
 			var vm = this;
 			this.meetingLocations[ml.geoId] = ml;
-			var marker = this.markers[ml.geoId];
-			if (marker) {
-				marker.setMap(null);
+			var salao = this.saloes[ml.geoId];
+			if (!salao) {
+				var near = this.findSalaoNearMeetingLocation(ml);
+				if (near) {
+					salao = near.salao;
+					salao.meetingLocations.push(ml);
+					this.saloesMLAdded[salao.first.geoId] = salao;
+				} else {
+					salao = {
+						first: ml,
+						marker: new google.maps.Marker({
+							position: {
+								lat: ml.location.latitude,
+								lng: ml.location.longitude
+							},
+							map: this.map,
+							title: ml.properties.address
+						}),
+						meetingLocations: [ml]
+					};
+					this.saloesFirst[ml.geoId] = salao;
+					salao.marker.addListener('click', function() {
+						vm.selectedSalao = salao;
+						if (vm.openInfo) {
+							vm.openInfo.close();
+							vm.openInfo = null;
+						}
+						if (vm.refInfoSalao) {
+							vm.refInfoSalao.$destroy();
+							vm.refInfoSalao = null;
+						}
+						vm.selectedPropsData.salao = salao;
+						vm.selectedPropsData.saveLoading = false;
+						vm.selectedPropsData.saveError = null;
+						vm.selectedPropsData.saveData = null;
+						vm.refInfoSalao = new vm.InfoSalao({
+							propsData: vm.selectedPropsData,
+							el: (function() {
+								var parent = document.createElement('div');
+								var el = document.createElement('div');
+								parent.appendChild(el);
+								return el;
+							})()
+						});
+						vm.refInfoSalao.$on('select', vm.selectMeetingLocation);
+						vm.openInfo = new google.maps.InfoWindow({
+							content: vm.refInfoSalao.$el
+						});
+						vm.openInfo.open(vm.map, salao.marker);
+						// });
+					});
+					// this.markers[ml.geoId] = salao.marker;
+				}
+				this.saloes[ml.geoId] = salao;
 			}
-			marker = new google.maps.Marker({
-				position: {
-					lat: ml.location.latitude,
-					lng: ml.location.longitude
-				},
-				map: this.map,
-				title: ml.properties.orgName
-			});
-			marker.addListener('click', function() {
-				vm.selectedMeeting = vm.selectedMeeting === ml ? null : ml;
-			});
-			this.markers[ml.geoId] = marker;
 			var stat = vm.lastStats;
 			stat.total++;
 			var meta = ml['-rdc-meta'];
@@ -110,9 +202,12 @@ RECAM.comp['logado/mapa'] = {
 					}
 					console.log(data, query);
 					vm.lastStats = {src:'db', total:0};
+					vm.saloesMLAdded = {};
 					Utils.forEach(data.geoLocationList, function(ml) {
 						vm.addMarker(ml);
 					});
+					console.log(vm.saloesMLAdded);
+					vm.saloesMLAdded = null;
 					vm.loadStats.push(vm.lastStats);
 				}
 			});
@@ -132,12 +227,36 @@ RECAM.comp['logado/mapa'] = {
 					}
 					console.log(data, query);
 					vm.lastStats = {src:'jw', total:0};
+					vm.saloesMLAdded = {};
 					Utils.forEach(data.geoLocationList, function(ml) {
 						vm.addMarker(ml);
 					});
+					console.log(vm.saloesMLAdded);
+					vm.saloesMLAdded = null;
 					vm.loadStats.push(vm.lastStats);
 				}
 			});
+		},
+		loadInfoComponent: function() {
+			var vm = this;
+			vm.InfoSalao = INFOSALAO_LOADING;
+			var compName = 'recam--logado--mapa--info-salao';
+			Vue.options.componentDynamic(compName)(
+				function(infoSalao) {
+					infoSalao.store = RECAM.store;
+					vm.InfoSalao = Vue.component(compName, infoSalao);
+				},
+				function(err) {
+					vm.InfoSalao = INFOSALAO_ERROR;
+					var strObject = String({});
+					err = (err.message || err.error || err);
+					var strErr = String(err);
+					if (strErr === strObject) {
+						strErr = JSON.stringify(err);
+					}
+					alert(strErr);
+				}
+			);
 		}
 	},
 	mounted: function() {
@@ -145,21 +264,26 @@ RECAM.comp['logado/mapa'] = {
 	},
 	created: function() {
 		var vm = this;
-		this.markers = {};
+		this.saloes = {};
+		this.openInfo = null;
+		this.refInfoSalao = null;
+		this.saloesFirst = {};
+		this.saloesMLAdded = null;
 		this.loadLocationsDBDebounce = Utils.debounce(function() {
 			if (vm.loadingDB) {
 				// vm.loadLocationsDBDebounce();
 				return;
 			}
 			vm.loadLocationsDB();
-		}, 3000);
+		}, 4000);
 		this.loadLocationsJWDebounce = Utils.debounce(function() {
 			if (vm.loadingJW) {
 				// vm.loadLocationsJWDebounce();
 				return;
 			}
 			vm.loadLocationsJW();
-		}, 10000);
+		}, 15000);
+		this.loadInfoComponent();
 	}
 };
 
