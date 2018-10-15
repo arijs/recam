@@ -3,14 +3,14 @@
 		<template v-if="select">
 			<p>Deseja selecionar esta como a sua congregação?</p>
 			<p><strong v-text="select.properties.orgName"></strong></p>
-			<p class="lmi-confirm-buttons" v-if="saveLoading">
+			<p class="lmi-confirm-buttons" v-if="loading">
 				<button type="submit" class="btn btn-secondary" disabled>Gravando...</button>
 				<a href="javascript:;" class="btn btn-link text-muted float-right">Cancelar</a>
 			</p>
-			<p class="lmi-confirm-buttons text-danger" v-else-if="saveError">
+			<p class="lmi-confirm-buttons text-danger" v-else-if="error">
 				Erro ao gravar a alteração
 			</p>
-			<p class="lmi-confirm-buttons text-success" v-else-if="saveData">
+			<p class="lmi-confirm-buttons text-success" v-else-if="data">
 				Alteração gravada com sucesso!
 			</p>
 			<p class="lmi-confirm-buttons" v-else>
