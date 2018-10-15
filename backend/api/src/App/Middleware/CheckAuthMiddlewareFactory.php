@@ -9,8 +9,10 @@ use Zend\Authentication\AuthenticationService;
 
 class CheckAuthMiddlewareFactory
 {
-    public function __invoke(ContainerInterface $container) : AuthMiddleware
+    public function __invoke(ContainerInterface $container) : CheckAuthMiddleware
     {
-        return new CheckAuthMiddleware($container->get(AuthenticationService::class));
+        return new CheckAuthMiddleware(
+            $container->get(AuthenticationService::class)
+        );
     }
 }

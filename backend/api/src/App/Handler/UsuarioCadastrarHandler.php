@@ -16,12 +16,15 @@ use Zend\Authentication\AuthenticationService;
 use \App\MyAuthAdapter;
 use \App\Model\Usuario;
 use \App\Model\UsuarioTable;
+use \App\Model\LocalReuniao;
+use \App\Model\LocalReuniaoTable;
 
 class UsuarioCadastrarHandler implements RequestHandlerInterface
 {
     // private $router;
     private $template;
     private $usuarioTable;
+    private $localReuniaoTable;
     private $auth;
     private $authAdapter;
 
@@ -29,12 +32,14 @@ class UsuarioCadastrarHandler implements RequestHandlerInterface
         // RouterInterface $router,
         TemplateRendererInterface $template,
         UsuarioTable $usuarioTable,
+        LocalReuniaoTable $localReuniaoTable,
         AuthenticationService $auth,
         MyAuthAdapter $authAdapter
     ) {
         // $this->router       = $router;
         $this->template     = $template;
         $this->usuarioTable = $usuarioTable;
+        $this->localReuniaoTable = $localReuniaoTable;
         $this->auth         = $auth;
         $this->authAdapter  = $authAdapter;
     }

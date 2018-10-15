@@ -142,6 +142,14 @@ class UsuarioTable
         );
     }
 
+    public function updateUsuarioArray($id, array $update)
+    {
+        $this->tableGateway->update(
+            $update,
+            ['usuario_id' => (int) $id]
+        );
+    }
+
     public function deleteUsuario($id)
     {
         $this->tableGateway->delete(['usuario_id' => (int) $id]);

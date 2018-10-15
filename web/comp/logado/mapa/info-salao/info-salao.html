@@ -1,0 +1,32 @@
+<div class="recam--logado--mapa--info-salao">
+	<template v-if="salao">
+		<template v-if="select">
+			<p>Deseja selecionar esta como a sua congregação?</p>
+			<p><strong v-text="select.properties.orgName"></strong></p>
+			<p class="lmi-confirm-buttons" v-if="saveLoading">
+				<button type="submit" class="btn btn-secondary" disabled>Gravando...</button>
+				<a href="javascript:;" class="btn btn-link text-muted float-right">Cancelar</a>
+			</p>
+			<p class="lmi-confirm-buttons text-danger" v-else-if="saveError">
+				Erro ao gravar a alteração
+			</p>
+			<p class="lmi-confirm-buttons text-success" v-else-if="saveData">
+				Alteração gravada com sucesso!
+			</p>
+			<p class="lmi-confirm-buttons" v-else>
+				<button type="submit" class="btn btn-primary" v-on:click="confirmSelection">Confirmar</button>
+				<a href="javascript:;" class="btn btn-link float-right" v-on:click="cancelSelection">Cancelar</a>
+			</p>
+		</template>
+		<template v-else>
+			<div class="lmi-address">
+				<p v-for="addrLine in salao.first.properties.address.split(/\r?\n/g)" v-if="!/^\s*$/.test(addrLine)" v-text="addrLine"></p>
+			</div>
+			<ul class="lmi-cong-list">
+				<li class="lmi-cong" v-for="ml in salao.meetingLocations">
+					<a href="javascript:;" v-text="ml.properties.orgName" v-on:click="selectMeetingLocation(ml)"></a>
+				</li>
+			</ul>
+		</template>
+	</template>
+</div>

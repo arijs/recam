@@ -8,15 +8,17 @@ use Psr\Container\ContainerInterface;
 use Zend\Expressive\Template\TemplateRendererInterface;
 use Zend\Authentication\AuthenticationService;
 use \App\Model\UsuarioTable;
+use \App\Model\LocalReuniaoTable;
 use \App\MyAuthAdapter;
 
-class UsuarioCadastrarHandlerFactory
+class UsuarioHandlerFactory
 {
-    public function __invoke(ContainerInterface $container) : UsuarioCadastrarHandler
+    public function __invoke(ContainerInterface $container, $class, array $options = null)
     {
-        return new UsuarioCadastrarHandler(
+        return new $class(
             $container->get(TemplateRendererInterface::class),
             $container->get(UsuarioTable::class),
+            $container->get(LocalReuniaoTable::class),
             $container->get(AuthenticationService::class),
             $container->get(MyAuthAdapter::class)
         );
