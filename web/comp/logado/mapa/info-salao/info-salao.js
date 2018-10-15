@@ -6,21 +6,14 @@ RECAM.comp['logado/mapa/info-salao'] = {
 	props: {
 		salao: {
 			type: Object
-		},
-		saveLoading: {
-			type: Boolean,
-			required: true
-		},
-		saveError: {
-			type: Object
-		},
-		saveData: {
-			type: Object
 		}
 	},
 	data: function() {
 		return {
-			select: null
+			select: null,
+			loading: false,
+			error: null,
+			data: null
 		};
 	},
 	methods: {
@@ -33,6 +26,11 @@ RECAM.comp['logado/mapa/info-salao'] = {
 		},
 		confirmSelection: function() {
 			this.$emit('select', this.select);
+		},
+		updateRequest: function(loading, error, data) {
+			this.loading = loading;
+			this.error = error;
+			this.data = data;
 		}
 	}
 };

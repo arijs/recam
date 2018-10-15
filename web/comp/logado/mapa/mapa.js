@@ -13,12 +13,6 @@ RECAM.comp['logado/mapa'] = {
 			lastQuery: null,
 			meetingLocations: {},
 			selectedSalao: null,
-			selectedPropsData: {
-				salao: null,
-				saveLoading: false,
-				saveError: null,
-				saveData: null
-			},
 			lastStats: null,
 			loadStats: []
 		};
@@ -75,15 +69,17 @@ RECAM.comp['logado/mapa'] = {
 		selectMeetingLocation: function(ml) {
 			console.log(ml);
 			var vm = this;
-			vm.selectedPropsData.saveLoading = true;
+			vm.refInfoSalao.updateRequest(true, null, null);
 			this.$store.dispatch('loadUsuarioLocalReuniao', {
 				usuario_id: vm.$store.state.session.usuario.usuario_id,
 				reuniao_id: ml['-rdc-meta'].id,
 				geo_id: ml.geoId
 			}).then(function() {
-				vm.selectedPropsData.saveError = vm.$store.state.serviceUsuarioLocalReuniaoError;
-				vm.selectedPropsData.saveData = vm.$store.state.serviceUsuarioLocalReuniao;
-				vm.selectedPropsData.saveLoading = false;
+				vm.refInfoSalao.updateRequest(
+					false,
+					vm.$store.state.serviceUsuarioLocalReuniaoError,
+					vm.$store.state.serviceUsuarioLocalReuniao
+				);
 				// console.log(
 				// 	vm.$store.state.serviceUsuarioLocalReuniaoError,
 				// 	vm.$store.state.serviceUsuarioLocalReuniao
@@ -151,12 +147,10 @@ RECAM.comp['logado/mapa'] = {
 							vm.refInfoSalao.$destroy();
 							vm.refInfoSalao = null;
 						}
-						vm.selectedPropsData.salao = salao;
-						vm.selectedPropsData.saveLoading = false;
-						vm.selectedPropsData.saveError = null;
-						vm.selectedPropsData.saveData = null;
 						vm.refInfoSalao = new vm.InfoSalao({
-							propsData: vm.selectedPropsData,
+							propsData: {
+								salao: salao
+							},
 							el: (function() {
 								var parent = document.createElement('div');
 								var el = document.createElement('div');
