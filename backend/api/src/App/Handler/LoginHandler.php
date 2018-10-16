@@ -131,6 +131,8 @@ class LoginHandler implements RequestHandlerInterface
                 } else {
                     try {
                         $provider = $this->authAdapter->getGoogleProvider($returnUrl.'?authreturn=google');
+                        // print_r($provider);
+                        // die;
                         $shortToken = $provider->getAccessToken('authorization_code', [
                             'code' => $query['code']
                         ]);
