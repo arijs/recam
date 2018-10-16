@@ -15,6 +15,7 @@ class MyAuthAdapterFactory
         return new MyAuthAdapter(
             $container->get(Model\UsuarioTable::class),
             $container->get(Model\UsuarioAcessoTable::class),
+            $container->get(Model\LocalReuniaoTable::class),
             $config['auth']
         );
     }

@@ -95,7 +95,16 @@ class UsuarioLocalReuniaoHandler implements RequestHandlerInterface
                 $this->usuarioTable->updateUsuarioArray($usuario_id, [
                     'id_reuniao' => $reuniao_id,
                 ]);
-                $update_success = true;
+                $this->authAdapter->setCurrentIdentity($this->auth->getIdentity());
+                $this->authAdapter->setReuniao($lr);
+                $result = $this->auth->authenticate();
+                if ($result->isValid()) {
+                    $session = $result->getIdentity();
+                    $update_success = true;
+                } else {
+                    $erro_localReuniao = array_merge($erro_localReuniao, $result->getMessages());
+                    $update_success = false;
+                }
             }
         }
 
@@ -108,6 +117,9 @@ class UsuarioLocalReuniaoHandler implements RequestHandlerInterface
             'success' => $update_success,
             'error' => !$update_success,
             'errorFields' => empty($errors) ? null : $errors,
+            'session' => $update_success ? [
+                'reuniao' => $session['reuniao'],
+            ] : null,
         ], $update_success ? 200 : (empty($errors) ? 500 : 400));
     }
 }

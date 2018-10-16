@@ -59,6 +59,9 @@ Vue.options.componentDynamic('recam--root')(
 			computed: {
 				errorText: function() {
 					var err = this.error;
+					if (err && err.error && err.error.stack) {
+						err.error = err.error.stack;
+					}
 					if (String(err) === strObject) {
 						err = JSON.stringify(err, null, 2);
 					}

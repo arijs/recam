@@ -14,11 +14,13 @@
 			</p>
 		</div>
 	</div>
-	<div class="lm-stats">
-		<pre>{{ printStats }}</pre>
-	</div>
-	<div v-if="selectedSalao" class="lm-selected">
-		<pre v-text="JSON.stringify({first: selectedSalao.first.properties.orgName, all: selectedSalao.meetingLocations}, null, '\t')"></pre>
-	</div>
-	<div v-else class="lm-selected empty"></div>
+	<template v-if="mapaDebug">
+		<div class="lm-stats">
+			<pre>{{ printStats }}</pre>
+		</div>
+		<div v-if="selectedSalao" class="lm-selected">
+			<pre v-text="JSON.stringify({first: selectedSalao.first.properties.orgName, all: selectedSalao.meetingLocations}, null, '\t')"></pre>
+		</div>
+		<div v-else class="lm-selected empty"></div>
+	</template>
 </div>
