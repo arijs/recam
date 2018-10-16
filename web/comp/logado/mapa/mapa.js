@@ -22,6 +22,9 @@ RECAM.comp['logado/mapa'] = {
 			return Utils.forEach(this.loadStats, [], function(stats) {
 				this.result.unshift(JSON.stringify(stats));
 			}).join('\n')
+		},
+		mapaDebug: function() {
+			return false;
 		}
 	},
 	methods: {
@@ -75,11 +78,12 @@ RECAM.comp['logado/mapa'] = {
 				reuniao_id: ml['-rdc-meta'].id,
 				geo_id: ml.geoId
 			}).then(function() {
-				vm.refInfoSalao.updateRequest(
-					false,
-					vm.$store.state.serviceUsuarioLocalReuniaoError,
-					vm.$store.state.serviceUsuarioLocalReuniao
-				);
+				var error = vm.$store.state.serviceUsuarioLocalReuniaoError;
+				var data = vm.$store.state.serviceUsuarioLocalReuniao;
+				vm.refInfoSalao.updateRequest(false, error, data);
+				if (!error && data) {
+					vm.$emit('selecionado');
+				}
 				// console.log(
 				// 	vm.$store.state.serviceUsuarioLocalReuniaoError,
 				// 	vm.$store.state.serviceUsuarioLocalReuniao

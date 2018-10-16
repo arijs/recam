@@ -11,6 +11,7 @@ class Usuario
     public $usuario_senha;
     public $usuario_registro;
     public $usuario_autorizado;
+    public $id_reuniao;
     public $id_facebook;
     public $id_google;
     public $id_twitter;
@@ -23,6 +24,7 @@ class Usuario
         $this->usuario_nome  = !empty($data['usuario_nome']) ? $data['usuario_nome'] : null;
         $this->usuario_email = !empty($data['usuario_email']) ? $data['usuario_email'] : null;
         $this->usuario_senha = !empty($data['usuario_senha']) ? $data['usuario_senha'] : null;
+        $this->id_reuniao    = !empty($data['id_reuniao']) ? $data['id_reuniao'] : null;
         $this->id_facebook   = !empty($data['id_facebook']) ? $data['id_facebook'] : null;
         $this->id_google     = !empty($data['id_google']) ? $data['id_google'] : null;
         $this->id_twitter    = !empty($data['id_twitter']) ? $data['id_twitter'] : null;
@@ -56,6 +58,7 @@ class Usuario
           'usuario_nome'  => $this->usuario_nome,
           'usuario_email' => $this->usuario_email,
           'usuario_senha' => $this->usuario_senha,
+          'id_reuniao' => $this->id_reuniao,
           'id_facebook' => $this->id_facebook,
           'id_google' => $this->id_google,
           'id_twitter' => $this->id_twitter,
@@ -64,5 +67,11 @@ class Usuario
           'usuario_autorizado' => $autorizado,
       ];
       return $data;
+    }
+
+    public function toArraySessao() {
+        $data = $this->toArray();
+        unset($data['usuario_senha']);
+        return $data;
     }
 }

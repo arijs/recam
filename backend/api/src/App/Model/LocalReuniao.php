@@ -87,4 +87,10 @@ class LocalReuniao
       ];
       return $data;
     }
+
+    public function toArraySessao() {
+        $data = $this->toArray();
+        unset($data['json']);
+        return $data;
+    }
 }

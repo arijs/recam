@@ -17,17 +17,21 @@ class MyAuthAdapter implements AdapterInterface
     private $linkedin;
     private $github;
     private $paypal;
+    private $reuniao;
     private $usuarioTable;
     private $usuarioAcessoTable;
+    private $localReuniaoTable;
     private $config;
 
     public function __construct(
         Model\UsuarioTable $usuarioTable,
         Model\UsuarioAcessoTable $usuarioAcessoTable,
+        Model\LocalReuniaoTable $localReuniaoTable,
         array $config
     ) {
         $this->usuarioTable = $usuarioTable;
         $this->usuarioAcessoTable = $usuarioAcessoTable;
+        $this->localReuniaoTable = $localReuniaoTable;
         $this->config = $config;
     }
 
@@ -47,6 +51,11 @@ class MyAuthAdapter implements AdapterInterface
             'password' => $usuario->usuario_senha,
             'usuario'  => $usuario,
         );
+    }
+
+    public function setReuniao(Model\LocalReuniao $reuniao) : void
+    {
+        $this->reuniao = $reuniao;
     }
 
     public function setCurrentIdentity($identity) : void
@@ -118,6 +127,7 @@ class MyAuthAdapter implements AdapterInterface
             $identity['username'] = null;
             $identity['usuario'] = null;
             $identity['acesso'] = null;
+            $identity['reuniao'] = null;
             $u = $this->account['username'];
             $p = $this->account['password'];
             $usuario = $this->account['usuario'];
@@ -134,9 +144,17 @@ class MyAuthAdapter implements AdapterInterface
                     ]);
                 }*/
                 $acesso = $this->registerAcessoUsuario($usuario);
+                $reuniao = null;
+                if (!empty($usuario->id_reuniao)) {
+                    $reuniao = $this->localReuniaoTable->getLocalReuniao($usuario->id_reuniao);
+                    if (!empty($reuniao)) {
+                        $reuniao = $reuniao->toArraySessao();
+                    }
+                }
                 $identity['username'] = $usuario->usuario_email;
-                $identity['usuario'] = $usuario->toArray();
+                $identity['usuario'] = $usuario->toArraySessao();
                 $identity['acesso'] = $acesso->toArray();
+                $identity['reuniao'] = $reuniao;
                 $success = true;
             } else {
                 return new Result(Result::FAILURE_CREDENTIAL_INVALID, $u, [
@@ -176,6 +194,10 @@ class MyAuthAdapter implements AdapterInterface
         //     $success = true;
         // }
 
+        if (!empty($this->reuniao)) {
+            $identity['reuniao'] = $this->reuniao->toArraySessao();
+        }
+
         if ($success) {
             return new Result(Result::SUCCESS, $identity);
         } else {
@@ -201,13 +223,10 @@ class MyAuthAdapter implements AdapterInterface
                 ? $acesso->toArray()
                 : $acesso;
         }
-        if (!empty($session['username'])) {
-            $array['username'] = $session['username'];
-        }
-        $redes = ['facebook', 'google', 'twitter', 'linkedin'];
-        foreach ($redes as $r) {
-            if (!empty($session[$r])) {
-                $array[$r] = $session[$r];
+        $direto = ['username', 'reuniao', 'facebook', 'google', 'twitter', 'linkedin'];
+        foreach ($direto as $d) {
+            if (!empty($session[$d])) {
+                $array[$d] = $session[$d];
             }
         }
         return $array;

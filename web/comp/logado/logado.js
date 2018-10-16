@@ -8,15 +8,24 @@ RECAM.comp['logado'] = {
 		logoutLoading: function() {
 			return this.$store.state.serviceLogoutLoading;
 		},
-		session: function() {
-			return this.$store.state.session;
-		},
+		// session: function() {
+		// 	return this.$store.state.session;
+		// },
 		usuario: function() {
-			return this.session.usuario;
+			return this.$store.state.session.usuario;
 		},
 		acesso: function() {
-			return this.session.acesso;
-		}
+			return this.$store.state.session.acesso;
+		},
+		reuniao: function() {
+			return this.$store.state.session.reuniao;
+		},
+	},
+	data: function() {
+		return {
+			renderizarMapa: false,
+			exibirMapa: false
+		};
 	},
 	methods: {
 		printModelDate: function(dt) {
@@ -28,6 +37,17 @@ RECAM.comp['logado'] = {
 					m[1]
 				].join('/');
 			}
+		},
+		selecionarCongregacao: function() {
+			this.renderizarMapa = true;
+			this.exibirMapa = true;
+		},
+		reuniaoSelecionada: function() {
+			var vm = this;
+			setTimeout(function() {
+				vm.exibirMapa = false;
+			}, 4000);
+			vm.$forceUpdate();
 		},
 		clickLogout: function() {
 			this.$store.dispatch('loadLogout');

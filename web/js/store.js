@@ -313,6 +313,7 @@ var actions = {
 						resolve();
 					} else {
 						context.commit('setUsuarioLocalReuniao', data);
+						context.commit('setSessionReuniao', data.session.reuniao);
 						resolve();
 					}
 				}
@@ -433,7 +434,19 @@ var mutations = {
 		if (ps[1] != null && !isNaN(+ps[1])) sps[1] = ps[1];
 	},
 	setSession: function(state, session) {
-		state.session = session;
+		state.session = session ? {
+			usuario: session.usuario,
+			acesso: session.acesso,
+			reuniao: session.reuniao,
+			username: session.username,
+			facebook: session.facebook,
+			google: session.google,
+			twitter: session.twitter,
+			linkedin: session.linkedin
+		} : null;
+	},
+	setSessionReuniao: function(state, reuniao) {
+		state.session.reuniao = reuniao;
 	},
 	setFormCampoValor: function(state, payload) {
 		payload.campo.valor = payload.valor;
