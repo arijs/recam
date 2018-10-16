@@ -15,6 +15,21 @@ function validaObrigatoriedadeSenha(campo, context) {
 		return { falta: !Boolean(rede) };
 	}
 }
+function processMeetingLocationName(name) {
+	name = name.split(/\s*-\s*/g);
+	var nameParts = name.length;
+	if (nameParts >= 4) {
+		var reCityState = /^\s*(\S.*?)\s*,?\s*(\w{2})\s*$/;
+		var cityState = name[nameParts-1].match(reCityState);
+		if (cityState) {
+			var reRepeat = new RegExp('^\\s*'+cityState[1]+'\\s*,?\\s*'+cityState[2]+'\\s+\\(?\\s*'+name[nameParts-2]+'\\s*\\)?\\s*$');
+			if (reRepeat.test(name[nameParts-3])) {
+				name.splice(nameParts-3, 1);
+			}
+		}
+	}
+	return name.join(' - ');
+}
 
 var state = {
 	baseUrl: (RECAM.BaseUrl || ''),
@@ -188,6 +203,9 @@ var getters = {
 				linkedin: getters.sessionLinkedinId
 			};
 		};
+	},
+	processMeetingLocationName: function() {
+		return processMeetingLocationName;
 	}
 };
 var actions = {
@@ -434,6 +452,9 @@ var mutations = {
 		if (ps[1] != null && !isNaN(+ps[1])) sps[1] = ps[1];
 	},
 	setSession: function(state, session) {
+		if (session && session.reuniao && session.reuniao.name) {
+			session.reuniao.name = processMeetingLocationName(session.reuniao.name);
+		}
 		state.session = session ? {
 			usuario: session.usuario,
 			acesso: session.acesso,
@@ -446,6 +467,9 @@ var mutations = {
 		} : null;
 	},
 	setSessionReuniao: function(state, reuniao) {
+		if (reuniao && reuniao.name) {
+			reuniao.name = processMeetingLocationName(reuniao.name);
+		}
 		state.session.reuniao = reuniao;
 	},
 	setFormCampoValor: function(state, payload) {

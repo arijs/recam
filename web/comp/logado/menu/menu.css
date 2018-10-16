@@ -1,0 +1,19 @@
+.recam--logado--menu .navbar-brand img {
+	width: auto;
+	height: 2em;
+	margin-bottom: -2em;
+	position: relative;
+	bottom: 1.2em;
+}
+
+@media (max-width: 359px) {
+	.recam--logado--menu .lm-brand-label {
+		display: none;
+	}
+}
+
+@media (max-width: 575px) {
+	.recam--logado--menu .navbar-brand {
+		margin-right: 0;
+	}
+}

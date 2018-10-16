@@ -119,6 +119,7 @@ RECAM.comp['logado/mapa'] = {
 		},
 		addMarker: function(ml) {
 			var vm = this;
+			ml.properties.orgName = this.$store.getters.processMeetingLocationName(ml.properties.orgName);
 			this.meetingLocations[ml.geoId] = ml;
 			var salao = this.saloes[ml.geoId];
 			if (!salao) {
