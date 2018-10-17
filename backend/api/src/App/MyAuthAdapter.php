@@ -286,7 +286,12 @@ class MyAuthAdapter implements AdapterInterface
 
     public function initTwitter($returnUrl)
     {
-        $provider = $this->getTwitterProvider();
+        return $this->initTwitterProvider($this->getTwitterProvider(), $returnUrl);
+    }
+
+    public function initTwitterProvider($provider, $returnUrl)
+    {
+        // $provider = $this->getTwitterProvider();
         $requestToken = $provider->oauth('oauth/request_token', [
             'oauth_callback' => $returnUrl,
         ]);

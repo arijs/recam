@@ -10,6 +10,7 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Zend\Authentication\AuthenticationService;
 use Zend\Diactoros\Response\RedirectResponse;
+use Zend\Diactoros\Response\JsonResponse;
 
 class CheckAuthMiddleware implements MiddlewareInterface
 {
@@ -28,7 +29,11 @@ class CheckAuthMiddleware implements MiddlewareInterface
         $identity = $request->getAttribute(InjectAuthMiddleware::class);
 
         if (empty($identity)) {
-            return new RedirectResponse('/login');
+            // return new RedirectResponse('/login');
+            return new JsonResponse([
+                'error' => 'Usuário não autenticado',
+                'message' => 'É necessário fazer login para acessar este recurso.'
+            ], 401);
         }
 
         return $handler->handle($request);
