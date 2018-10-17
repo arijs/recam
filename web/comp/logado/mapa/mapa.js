@@ -23,6 +23,10 @@ RECAM.comp['logado/mapa'] = {
 				this.result.unshift(JSON.stringify(stats));
 			}).join('\n')
 		},
+		sessionMeetingLocation: function() {
+			var session = this.$store.state.session;
+			return session && session.reuniao;
+		},
 		mapaDebug: function() {
 			return false;
 		}
@@ -59,10 +63,19 @@ RECAM.comp['logado/mapa'] = {
 		},
 		renderMap: function() {
 			var vm = this;
-			var map = new google.maps.Map(this.$refs.map, {
-				zoom: 4,
-				center: {lat: -16, lng: -55}
-			});
+			var sml = this.sessionMeetingLocation;
+			var map;
+			if (sml) {
+				map = new google.maps.Map(this.$refs.map, {
+					zoom: 14,
+					center: {lat: sml.latitude, lng: sml.longitude}
+				});
+			} else {
+				map = new google.maps.Map(this.$refs.map, {
+					zoom: 4,
+					center: {lat: -16, lng: -55}
+				});
+			}
 			this.map = map;
 			map.addListener('bounds_changed', function() {
 				// vm.lastQuery = vm.getMapBounds();
