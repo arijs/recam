@@ -55,4 +55,8 @@ return function (Application $app, MiddlewareFactory $factory, ContainerInterfac
         App\Middleware\CheckAuthMiddleware::class,
         App\Handler\MailHandler::class
     ], ['GET', 'POST'], 'mail');
+    $app->get('/dne/{action:locations}', [
+        App\Middleware\CheckAuthMiddleware::class,
+        App\Handler\DneHandler::class
+    ], 'dne');
 };
