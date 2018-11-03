@@ -71,18 +71,21 @@ class LoginHandler implements RequestHandlerInterface
             'session' => $session,
         ];
         $query = $request->getQueryParams();
+        $sessionContainer = new Container();
         // $returnUrl = (isset($query['return']) ? $query['return'] : 'http://lacolhost.com/api/login');
         $returnUrl = (isset($query['return']) ? $query['return'] : 'https://'.$_SERVER['HTTP_HOST'].'/api/login');
         if (isset($query['authreturn'])) {
             $login = $query['authreturn'];
             if ($login === 'facebook') {
-                $sessionContainer = new Container();
                 if (empty($query['code'])) {
                     $response['error'] = 'Parâmetro "code" não encontrado';
                 } else if (empty($query['state'])) {
                     $response['error'] = 'Parâmetro "state" não encontrado';
                 } else if (empty($sessionContainer->authFacebookState)) {
-                    $response['error'] = 'Parâmetro "state" não encontrado na sessão';
+                    // $response['error'] = 'Parâmetro "state" não encontrado na sessão';
+                    $facebook = $this->authAdapter->initFacebook($returnUrl.'?authreturn=facebook');
+                    $sessionContainer->authFacebookState = $facebook['state'];
+                    return new RedirectResponse($facebook['auth_url']);
                 } else if ($query['state'] !== $sessionContainer->authFacebookState) {
                     $response['error'] = 'Parâmetro "state" diferente que o armazenado';
                 } else {
@@ -119,7 +122,6 @@ class LoginHandler implements RequestHandlerInterface
                     }
                 }
             } else if ($login === 'google') {
-                $sessionContainer = new Container();
                 if (empty($query['code'])) {
                     $response['error'] = 'Parâmetro "code" não encontrado';
                 } else if (empty($query['state'])) {
@@ -163,7 +165,6 @@ class LoginHandler implements RequestHandlerInterface
                     }
                 }
             } else if ($login === 'twitter') {
-                $sessionContainer = new Container();
                 $sessionTwitter = $sessionContainer->authTwitterState;
                 $twitterToken = isset($sessionTwitter['oauth_token'])
                     ? $sessionTwitter['oauth_token'] : null;
@@ -172,8 +173,14 @@ class LoginHandler implements RequestHandlerInterface
                 } else if (empty($query['oauth_verifier'])) {
                     $response['error'] = 'Parâmetro "oauth_verifier" não encontrado';
                 } else if (empty($twitterToken)) {
-                    $response['error'] = 'Parâmetro "oauth_token" não encontrado na sessão';
-                } else if ($query['oauth_token'] !== $twitterToken) {
+                    // $response['error'] = 'Parâmetro "oauth_token" não encontrado na sessão';
+                    $twitter = $this->authAdapter->initTwitter($returnUrl.'?authreturn=twitter');
+                    $sessionContainer->authTwitterState = [
+                        'oauth_token' => $twitter['oauth_token'],
+                        'oauth_token_secret' => $twitter['oauth_token_secret'],
+                    ];
+                    return new RedirectResponse($twitter['auth_url']);
+                } else if (!empty($twitterToken) && $query['oauth_token'] !== $twitterToken) {
                     $response['error'] = 'Parâmetro "oauth_token" diferente que o armazenado';
                 } else {
                     try {
@@ -220,13 +227,15 @@ class LoginHandler implements RequestHandlerInterface
                     }
                 }
             } else if ($login === 'linkedin') {
-                $sessionContainer = new Container();
                 if (empty($query['code'])) {
                     $response['error'] = 'Parâmetro "code" não encontrado';
                 } else if (empty($query['state'])) {
                     $response['error'] = 'Parâmetro "state" não encontrado';
                 } else if (empty($sessionContainer->authLinkedinState)) {
-                    $response['error'] = 'Parâmetro "state" não encontrado na sessão';
+                    // $response['error'] = 'Parâmetro "state" não encontrado na sessão';
+                    $linkedin = $this->authAdapter->initLinkedin($returnUrl.'?authreturn=linkedin');
+                    $sessionContainer->authLinkedinState = $linkedin['state'];
+                    return new RedirectResponse($linkedin['auth_url']);
                 } else if ($query['state'] !== $sessionContainer->authLinkedinState) {
                     $response['error'] = 'Parâmetro "state" diferente que o armazenado';
                 } else {
@@ -263,7 +272,6 @@ class LoginHandler implements RequestHandlerInterface
                 }
             }
         } else {
-            $sessionContainer = new Container();
 
             $facebook = $this->authAdapter->initFacebook($returnUrl.'?authreturn=facebook');
             $response['facebook'] = $facebook['auth_url'];

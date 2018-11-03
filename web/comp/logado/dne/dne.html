@@ -1,0 +1,61 @@
+<div class="recam--logado--dne pb-3">
+	<div class="bg-light">
+		<div class="row justify-content-center mx-0">
+			<div class="col">
+				<label>Localidades <input type="file" ref="fileLocation" name="location" v-on:change="changeFileLocation" /></label>
+			</div>
+		</div>
+		<div class="row justify-content-center mx-0">
+			<div class="col">
+				<label>
+					<input type="checkbox" v-model="runLocations" v-on:click="clickRunLocations" />
+					processar
+					<template v-if="queueLocations">
+						({{queueLocations.success}} salvos,
+						{{queueLocations.invalid}} inválidos,
+						{{queueLocations.errors}} erros,
+						{{queueLocations.total}} total)
+					</template>
+				</label>
+			</div>
+		</div>
+		<div class="row justify-content-center mx-0">
+			<div class="col">
+				<label>Bairros <input type="file" ref="fileNeighborhood" name="neighborhood" v-on:change="changeFileNeighborhood" /></label>
+			</div>
+		</div>
+		<div class="row justify-content-center mx-0">
+			<div class="col">
+				<label>
+					<input type="checkbox" v-model="runNeighborhoods" v-on:click="clickRunNeighborhoods" />
+					processar
+					<template v-if="queueNeighborhoods">
+						({{queueNeighborhoods.success}} salvos,
+						{{queueNeighborhoods.invalid}} inválidos,
+						{{queueNeighborhoods.errors}} erros,
+						{{queueNeighborhoods.total}} total)
+					</template>
+				</label>
+			</div>
+		</div>
+		<div class="row justify-content-center mx-0">
+			<div class="col">
+				<label>Logradouros <input type="file" ref="fileStreet" name="street" v-on:change="changeFileStreet" /></label>
+			</div>
+		</div>
+		<div class="row justify-content-center mx-0">
+			<div class="col">
+				<label>
+					<input type="checkbox" v-model="runStreets" v-on:click="clickRunStreets" />
+					processar
+					<template v-if="queueStreets">
+						({{queueStreets.success}} salvos,
+						{{queueStreets.invalid}} inválidos,
+						{{queueStreets.errors}} erros,
+						{{queueStreets.total}} total)
+					</template>
+				</label>
+			</div>
+		</div>
+	</div>
+</div>

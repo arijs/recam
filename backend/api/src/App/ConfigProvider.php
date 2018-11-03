@@ -51,6 +51,8 @@ class ConfigProvider
                 Handler\WeeklyMeetings::class => Handler\WeeklyMeetingsFactory::class,
                 Handler\WeeklyMeetingsDb::class => Handler\WeeklyMeetingsFactory::class,
                 Handler\MailHandler::class => Handler\MailHandlerFactory::class,
+                Handler\DneHandler::class => Handler\DneHandlerFactory::class,
+                Handler\NotFoundHandler::class => Handler\NotFoundHandlerFactory::class,
                 Model\UsuarioTable::class => Model\ModelTableFactory::class,
                 Model\UsuarioAcessoTable::class => Model\ModelTableFactory::class,
                 Model\UsuarioFacebookTable::class => Model\ModelTableFactory::class,

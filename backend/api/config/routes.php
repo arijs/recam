@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Psr\Container\ContainerInterface;
 use Zend\Expressive\Application;
 use Zend\Expressive\MiddlewareFactory;
+use Zend\Expressive\Helper\BodyParams\BodyParamsMiddleware;
 use App\Middleware\CheckAuthMiddleware;
 
 /**
@@ -55,4 +56,9 @@ return function (Application $app, MiddlewareFactory $factory, ContainerInterfac
         App\Middleware\CheckAuthMiddleware::class,
         App\Handler\MailHandler::class
     ], ['GET', 'POST'], 'mail');
+    $app->route('/dne[/{action:locations|neighborhoods|streets}]', [
+        App\Middleware\CheckAuthMiddleware::class,
+        BodyParamsMiddleware::class,
+        App\Handler\DneHandler::class
+    ], ['GET', 'POST'], 'dne');
 };
