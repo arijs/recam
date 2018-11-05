@@ -364,7 +364,11 @@ Utils.loadAjax = function loadAjax(opt) {
 			req.setRequestHeader(h.name, h.value);
 		});
 	}
-	req.send(opt.body);
+	try {
+		req.send(opt.body);
+	} catch (e) {
+		opt.cb(new AjaxError('Erro de rede no envio', req, err), null, req);
+	}
 };
 
 Utils.loadService = function(opt) {

@@ -55,6 +55,17 @@
 						{{queueStreets.total}} total)
 					</template>
 				</label>
+				<label>
+					<input type="checkbox" v-model="checkStreets" v-on:click="clickCheckStreets" />
+					conferir
+					<template v-if="queueCheckStreets">
+						({{queueCheckStreets.success}} corretos,
+						{{queueCheckStreets.invalid}} divergentes,
+						{{queueCheckStreets.notfound}} não encontrados,
+						{{queueCheckStreets.errors}} erros,
+						{{queueCheckStreets.total}} total)
+					</template>
+				</label>
 			</div>
 		</div>
 	</div>

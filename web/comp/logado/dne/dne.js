@@ -5,7 +5,8 @@ var reTrim = /^\s*|\s*$/g;
 var reSymbols = [
 	{re:/\s+[¿]\s+/g,rp:' '},
 	{re:/\S[¿]\S/g,rp:'\''},
-	{re:/[`´]/g,rp:'\''}
+	{re:/[`´]/g,rp:'\''},
+	{re:/[°]/g,rp:'º'}
 ]
 var colLoc = [
 	{re:/^\d{1,8}$/,key:'id',desc:'chave da localidade'},
@@ -30,13 +31,13 @@ var colStr = [
 	{re:/^[A-Z]{2}$/i,key:'uf',desc:'sigla da uf'},
 	{re:/^\d{1,8}$/,key:'lc',desc:'chave da localidade'},
 	{re:/^\d{1,8}$/,key:'ba',desc:'chave do bairro'},
-	{re:/^\d{0,8}$/,key:'bf',desc:'chave do bairro final (deprecado)'},
-	{re:/^[A-ZÁÀÂÃÇÉÈÊÍÑÓÔÕÚÜáàâãçéèêíñóôõúü'" 0-9ªº().,/+-]{1,96}$/i,key:'nm',desc:'nome do logradouro',rp:reSymbols},
+	{re:/^\d{0,8}$/,key:'bf',desc:'chave do bairro final (deprecado)',opt:true},
+	{re:/^[A-ZÁÀÂÃÄÇÉÈÊÍÑÓÒÔÕÚÜáàâãäçéèêíñóòôõúü'" 0-9ªº().,/+-]{1,96}$/i,key:'nm',desc:'nome do logradouro',rp:reSymbols},
 	{re:/^[A-ZÁÀÂÃÇÉÈÊÍÑÓÔÕÚÜáàâãçéèêíñóôõúü'" 0-9ªº().,/+-]{0,96}$/i,key:'cp',desc:'complemento do logradouro',rp:reSymbols},
 	{re:/^\d{8}$|^$/,key:'ce',desc:'CEP do logradouro'},
 	{re:/^[A-ZÁÂÃÇÉÊÍÓÔÕÚÜáâãçéêíóôõúü 0-9ªº]{2,36}$/i,key:'tp',desc:'tipo de logradouro'},
 	{re:/^[SN]$/i,key:'ut',desc:'utilização do tipo de logradouro'},
-	{re:/^[A-ZÁÀÂÃÇÉÈÊÍÑÓÔÕÚÜáàâãçéèêíñóôõúü'" 0-9ªº().,/+-]{1,36}$/i,key:'ab',desc:'abreviatura do logradouro',rp:reSymbols},
+	{re:/^[A-ZÁÀÂÃÄÇÉÈÊÍÑÓÒÔÕÚÜáàâãäçéèêíñóòôõúü'" 0-9ªº().,/+-]{1,36}$/i,key:'ab',desc:'abreviatura do logradouro',rp:reSymbols},
 ];
 
 RECAM.comp['logado/dne'] = {
@@ -47,7 +48,9 @@ RECAM.comp['logado/dne'] = {
 			runNeighborhoods: false,
 			queueNeighborhoods: null,
 			runStreets: false,
-			queueStreets: null
+			queueStreets: null,
+			checkStreets: false,
+			queueCheckStreets: null
 		}
 	},
 	methods: {
@@ -295,14 +298,27 @@ RECAM.comp['logado/dne'] = {
 					data = data.substr(lfpos+1);
 				} while (data.length);
 				// console.log(rows);
-				// vm.saveLocations(rows);
 				vm.queueStreets = {
-					rows: rows,
+					rows: [],
 					success: 0,
 					invalid: 0,
 					errors: 0,
-					total: rows.length
+					total: 0
 				};
+				vm.queueCheckStreets = {
+					rows: rows,
+					parsed: [],
+					page: 0,
+					success: 0,
+					wrong: 0,
+					invalid: 0,
+					invalidList: [],
+					notfound: 0,
+					skipSource: 0,
+					skipTarget: 0,
+					errors: 0,
+					total: rows.length
+				}
 			};
 			reader.readAsText(file, 'iso-8859-1');
 		},
@@ -342,6 +358,113 @@ RECAM.comp['logado/dne'] = {
 		clickRunStreets: function() {
 			this.$nextTick(this.saveStreets);
 		},
+		clickCheckStreets: function() {
+			this.$nextTick(this.loadStreets);
+		},
+		loadStreets: function() {
+			if (!this.checkStreets) return;
+			var qcs = this.queueCheckStreets;
+			var qrows = qcs.rows;
+			if (!qrows.length && !qcs.parsed.length) return;
+			var page = qcs.page + 1;
+			var vm = this;
+			var batch = 50;
+			Utils.loadAjax({
+				url: '/api/dne/streets?uf=SP&page='+page+'&rows='+batch,
+				cb: function(err, data) {
+					var drows = data && data.rows;
+					if (err || !drows) {
+						console.log('error', err, parsed);
+						qcs.errors += 1;
+						return void vm.loadStreets();
+					} else {
+						var count = drows.length;
+						var parsed = qcs.parsed;
+						var rowDb;
+						while (rowDb = drows.shift()) {
+							var first = true;
+							var idMatch = null;
+							while (qrows.length && !idMatch) {
+								var rowQ = null;
+								while (qrows.length && !rowQ) {
+									rowQ = vm.parseRowStreet(qrows.shift());
+									if (rowQ.erros) {
+										console.log('invalid', rowQ);
+										qcs.invalid += 1;
+										qcs.invalidList.push(rowQ);
+										rowQ = null;
+									} else {
+										rowQ = rowQ.parsed;
+									}
+								}
+								if (rowQ && rowQ.id === String(rowDb.id)) {
+									idMatch = rowQ;
+								}
+								if (!idMatch) {
+									if (first) {
+										qcs.skipSource += 1;
+										first = false;
+									}
+									qcs.skipTarget += 1;
+									parsed.push(rowQ);
+								}
+								rowQ = null;
+							}
+							if (!idMatch) {
+								var pc = parsed.length;
+								for (var j = 0; j < pc; j++) {
+									rowQ = parsed[j];
+									if (rowQ.id === String(rowDb.id)) {
+										idMatch = rowQ;
+										parsed.splice(j, 1);
+										break;
+									}
+								}
+								rowQ = null;
+							}
+							if (idMatch) {
+								var hop = Object.prototype.hasOwnProperty;
+								var propErrors = [];
+								var colStrCount = colStr.length;
+								for (var csi = 0; csi < colStrCount; csi++) {
+									var cs = colStr[csi];
+									var k = cs.key;
+									if (!cs.opt && !hop.call(rowDb, k)) {
+										propErrors.push('falta: '+cs.desc);
+									} else if (rowDb[k] ? rowDb[k] != idMatch[k] : idMatch[k] && !cs.opt) {
+										propErrors.push(
+											'erro: '+cs.desc+' (esperado '+
+											JSON.stringify(idMatch[k])+', obteve '+
+											JSON.stringify(rowDb[k])+')'
+										);
+									}
+								}
+								if (propErrors.length) {
+									console.log('prop error', propErrors, idMatch, rowDb);
+									vm.queueStreets.rows.push(idMatch);
+									vm.queueStreets.total += 1;
+									qcs.wrong += 1;
+								} else {
+									qcs.success += 1;
+								}
+							} else {
+								console.log('not found', rowDb);
+								qcs.notfound += 1;
+							}
+						}
+						//
+					}
+					if (count == batch) {
+						qcs.page = page;
+						vm.loadStreets();
+					} else {
+						console.log('finished', qcs);
+						qcs.parsed = [];
+						vm.queueStreets.rows = vm.queueStreets.rows.concat(parsed);
+					}
+				}
+			});
+		},
 		saveStreets: function() {
 			if (!this.runStreets) return;
 			var ql = this.queueStreets;
@@ -370,7 +493,7 @@ RECAM.comp['logado/dne'] = {
 					{name:'Content-Type',value:'application/json'}
 				],
 				body:JSON.stringify(parsed),
-				cb: function(err,data) {
+				cb: function(err, data) {
 					var rows = data && data.rows;
 					if (err || !rows) {
 						console.log('error', err, parsed);

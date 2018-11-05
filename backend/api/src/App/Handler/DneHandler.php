@@ -220,12 +220,67 @@ class DneHandler implements RequestHandlerInterface
     {
         if ($request->getMethod() === 'POST') {
             return $this->streetsSave($request);
+        } else if ($request->getMethod() === 'GET') {
+            return $this->streetsSelect($request);
         }
 
         return new JsonResponse([
             'baseUrl' => $request->getAttribute(\App\Middleware\InjectBaseUrlMiddleware::class),
             'error' => 'Method not allowed: '.$request->getMethod(),
         ], 405);
+    }
+
+    public function streetsSelect(ServerRequestInterface $request) : ResponseInterface
+    {
+        $query = $request->getQueryParams();
+        $uf = $query['uf'];
+        $page = intval($query['page']);
+        $rowsPage = intval($query['rows']);
+        $offset = ($page-1)*$rowsPage;
+        $db = $this->dbAdapter;
+
+        $qi = function ($name) use ($db) {
+            return $db->platform->quoteIdentifier($name);
+        };
+        $fp = function ($name) use ($db) {
+            return $db->driver->formatParameterName($name);
+        };
+        $sql = 'SELECT * FROM '.$qi('logradouros').' WHERE '.
+            $qi('uf').' = '.$fp('uf').
+            ' LIMIT '.$offset.', '.$rowsPage;
+        try {
+            $stm = $this->dbAdapter->createStatement($sql);//, $optionalParameters);
+        } catch (RuntimeException $e) {
+            $p = $e->getPrevious();
+            throw empty($p) ? $e : $p;
+        }
+        $result = $stm->execute([$uf]);
+        $columns = [
+            'id' => 'logradouro_id',
+            'uf' => 'uf',
+            'lc' => 'localidade_id',
+            'ba' => 'bairro_id',
+            'nm' => 'nome',
+            'nn' => 'nome_norm',
+            'cp' => 'complemento',
+            'ce' => 'cep',
+            'tp' => 'tipo',
+            'ut' => 'tipo_utiliza',
+            'ab' => 'abreviatura'
+        ];
+        $mapped = [];
+        foreach ($result as $row) {
+            $maprow = [];
+            foreach ($columns as $cprop => $cname) {
+                $maprow[$cprop] = $row[$cname];
+            }
+            $mapped[] = $maprow;
+            $maprow = null;
+        }
+        return new JsonResponse([
+            'sql' => $sql,
+            'rows' => $mapped
+        ]);
     }
 
     public function streetsSave(ServerRequestInterface $request) : ResponseInterface
