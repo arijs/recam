@@ -11,11 +11,22 @@ function AjaxError(message, xhr, error) {
 	this.message = message;
 	this.xhr = xhr;
 	this.error = error;
-	this.stack = (new Error()).stack;
+	this.stack = (new Error).stack;
 }
 AjaxError.prototype = new Error;
+AjaxError.prototype.constructor = AjaxError;
 
 Utils.AjaxError = AjaxError;
+
+function AjaxTimeout(message, xhr, time) {
+	this.name = 'AjaxTimeout';
+	this.message = message;
+	this.xhr = xhr;
+	this.time = time;
+	this.stack = (new Error).stack;
+}
+AjaxTimeout.prototype = new Error;
+AjaxTimeout.prototype.constructor = AjaxTimeout;
 
 var hop = Object.prototype.hasOwnProperty;
 
@@ -38,6 +49,8 @@ function love(mom, dad) {
 }
 
 Utils.love = love;
+
+function noop(){}
 
 Utils.forEach = function forEach(list, cb, result) {
 	var _break = 1 << 0;
@@ -339,6 +352,23 @@ Utils.loadStylesheet = function loadStylesheet(url, cb) {
 Utils.loadAjax = function loadAjax(opt) {
 	var req = new XMLHttpRequest;
 	var head = opt.headers;
+	var _timeout = null;
+	if (opt.timeout >= 0) {
+		_timeout = setTimeout(function() {
+			if (_timeout) {
+				var err = 'Tempo máximo estourado: '+
+					(opt.timeout/1000).toFixed(1)+
+					' segundos';
+				err = new AjaxTimeout(err, req, opt.timeout);
+				opt.cb(err, null, req);
+				opt.cb = function(err, data, req) {
+					console.log('Ajax callback after timeout', err, data, req, opt);
+				};
+				clearTimeout(_timeout);
+				_timeout = null;
+			}
+		}, opt.timeout);
+	}
 	req.addEventListener('load', function() {
 		var err = null;
 		if (req.status < 200 || req.status >= 300) {
@@ -354,9 +384,19 @@ Utils.loadAjax = function loadAjax(opt) {
 			}
 		}
 		opt.cb(err, data, req);
+		opt.cb = noop;
+		if (_timeout) {
+			clearTimeout(_timeout);
+			_timeout = null;
+		}
 	});
 	req.addEventListener('error', function(err) {
 		opt.cb(new AjaxError('Erro de rede', req, err), null, req);
+		opt.cb = noop;
+		if (_timeout) {
+			clearTimeout(_timeout);
+			_timeout = null;
+		}
 	});
 	req.open(opt.method || 'GET', opt.url);
 	if (head) {
@@ -368,6 +408,11 @@ Utils.loadAjax = function loadAjax(opt) {
 		req.send(opt.body);
 	} catch (e) {
 		opt.cb(new AjaxError('Erro de rede no envio', req, err), null, req);
+		opt.cb = noop;
+		if (_timeout) {
+			clearTimeout(_timeout);
+			_timeout = null;
+		}
 	}
 };
 

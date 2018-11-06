@@ -45,25 +45,28 @@
 		</div>
 		<div class="row justify-content-center mx-0">
 			<div class="col">
+				<label v-if="queueStreets">
+					({{queueStreets.rows.length}} puros,
+					{{queueStreets.parsed.length}} lidos,
+					{{queueStreets.invalid.length}} inválidos,
+					{{queueStreets.total}} total)
+				</label>
 				<label>
 					<input type="checkbox" v-model="runStreets" v-on:click="clickRunStreets" />
 					processar
 					<template v-if="queueStreets">
-						({{queueStreets.success}} salvos,
-						{{queueStreets.invalid}} inválidos,
-						{{queueStreets.errors}} erros,
-						{{queueStreets.total}} total)
+						({{queueStreets.save.success}} salvos,
+						{{queueStreets.save.errors.length}} erros)
 					</template>
 				</label>
 				<label>
 					<input type="checkbox" v-model="checkStreets" v-on:click="clickCheckStreets" />
 					conferir
-					<template v-if="queueCheckStreets">
-						({{queueCheckStreets.success}} corretos,
-						{{queueCheckStreets.invalid}} divergentes,
-						{{queueCheckStreets.notfound}} não encontrados,
-						{{queueCheckStreets.errors}} erros,
-						{{queueCheckStreets.total}} total)
+					<template v-if="queueStreets">
+						({{queueStreets.check.success}} corretos,
+						{{queueStreets.check.wrong.length}} divergentes,
+						{{queueStreets.check.notfound}} não encontrados,
+						{{queueStreets.check.errors}} erros)
 					</template>
 				</label>
 			</div>
