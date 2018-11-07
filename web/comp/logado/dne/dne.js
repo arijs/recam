@@ -34,12 +34,12 @@ var colStr = [
 	{re:/^\d{1,8}$/,key:'lc',desc:'chave da localidade'},
 	{re:/^\d{1,8}$/,key:'ba',desc:'chave do bairro'},
 	{re:/^\d{0,8}$/,key:'bf',desc:'chave do bairro final (deprecado)',opt:true},
-	{re:/^[A-ZÁÀÂÃÄÇÉÈÊÍÌÑÓÒÔÕÚÜáàâãäçéèêíìñóòôõúü'" 0-9ªº().,/+-]{1,96}$/i,key:'nm',desc:'nome do logradouro',rp:reSymbols},
+	{re:/^[A-ZÁÀÂÃÄÇÉÈÊÍÌÑÓÒÔÕÖÚÜáàâãäçéèêíìñóòôõöúü'" 0-9ªº().,/+-]{1,96}$/i,key:'nm',desc:'nome do logradouro',rp:reSymbols},
 	{re:/^[A-ZÁÀÂÃÇÉÈÊÍÑÓÔÕÚÜáàâãçéèêíñóôõúü'" 0-9ªº().,/+-]{0,96}$/i,key:'cp',desc:'complemento do logradouro',rp:reSymbols},
 	{re:/^\d{8}$|^$/,key:'ce',desc:'CEP do logradouro'},
 	{re:/^[A-ZÁÂÃÇÉÊÍÓÔÕÚÜáâãçéêíóôõúü 0-9ªº-]{2,36}$/i,key:'tp',desc:'tipo de logradouro'},
 	{re:/^[SN]$/i,key:'ut',desc:'utilização do tipo de logradouro'},
-	{re:/^[A-ZÁÀÂÃÄÇÉÈÊÍÌÑÓÒÔÕÚÜáàâãäçéèêíìñóòôõúü'" 0-9ªº().,/+-]{1,36}$/i,key:'ab',desc:'abreviatura do logradouro',rp:reSymbols},
+	{re:/^[A-ZÁÀÂÃÄÇÉÈÊÍÌÑÓÒÔÕÖÚÜáàâãäçéèêíìñóòôõöúü'" 0-9ªº().,/+-]{1,36}$/i,key:'ab',desc:'abreviatura do logradouro',rp:reSymbols},
 ];
 
 RECAM.comp['logado/dne'] = {
